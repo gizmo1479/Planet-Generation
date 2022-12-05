@@ -51,7 +51,7 @@ private:
     std::vector<float> m_sphereData;
 
     void setSphereVBO();
-    void rebuildMatrices();
+    void rebuildCameraMatrices(int w, int h);
 
     float  m_angleX;
     float  m_angleY;
