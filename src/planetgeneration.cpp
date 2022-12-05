@@ -6,7 +6,6 @@
 #include <iostream>
 #include "glm/gtx/transform.hpp"
 #include "settings.h"
-#include "utils/scenedata.h"
 #include <utils/shaderloader.h>
 
 PlanetGeneration::PlanetGeneration(QWidget *parent)
@@ -31,7 +30,7 @@ PlanetGeneration::PlanetGeneration(QWidget *parent)
 }
 
 
-// ================== Helper Functions
+// ================== Sphere Handler Functions
 
 glm::vec4 sphericalToCartesian(float phi, float theta)
 {
@@ -80,6 +79,12 @@ std::vector<float> generateSphereData(int phiTesselations, int thetaTesselations
     return data;
 }
 
+void PlanetGeneration::setSphereVBO() {
+    glBindBuffer(GL_ARRAY_BUFFER, m_sphere_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * m_sphereData.size(), m_sphereData.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void PlanetGeneration::finish() {
     killTimer(m_timer);
     this->makeCurrent();
@@ -89,12 +94,6 @@ void PlanetGeneration::finish() {
     glDeleteVertexArrays(1, &m_sphere_vao);
 
     this->doneCurrent();
-}
-
-void PlanetGeneration::setSphereVBO() {
-    glBindBuffer(GL_ARRAY_BUFFER, m_sphere_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * m_sphere.generateShape().size(), m_sphere.generateShape().data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void PlanetGeneration::initializeGL() {
@@ -125,36 +124,13 @@ void PlanetGeneration::initializeGL() {
     // Shader setup
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
 
-    // initialise sphere
-//    m_sphere = Sphere();
-//    m_sphere.updateParams(20, 20);
-
-//    // initialise sphere vbo and vao
-//    glGenBuffers(1, &m_sphere_vbo);
-//    glBindBuffer(GL_ARRAY_BUFFER, m_sphere_vbo);
-//    std::vector<GLfloat> sphere_data = m_sphere.generateShape();
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * sphere_data.size(), sphere_data.data(), GL_STATIC_DRAW);
-//    glGenVertexArrays(1, &m_sphere_vao);
-//    glBindVertexArray(m_sphere_vao);
-//    glEnableVertexAttribArray(0);
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
-//    glEnableVertexAttribArray(1);
-//    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
-//    glBindVertexArray(0);
-
-    // Generate and bind VBO
+    // Initialise sphere data and VBO/VAO
     glGenBuffers(1, &m_sphere_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_sphere_vbo);
-    // Generate sphere data
     m_sphereData = generateSphereData(10,20);
-    // Send data to VBO
     glBufferData(GL_ARRAY_BUFFER,m_sphereData.size() * sizeof(GLfloat),m_sphereData.data(), GL_STATIC_DRAW);
-    // Generate, and bind vao
     glGenVertexArrays(1, &m_sphere_vao);
     glBindVertexArray(m_sphere_vao);
-
-    // Enable and define attribute 0 to store vertex positions
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3 * sizeof(GLfloat),reinterpret_cast<void *>(0));
 

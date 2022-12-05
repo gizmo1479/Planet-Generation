@@ -1,7 +1,6 @@
 #pragma once
 
 // Defined before including GLEW to suppress deprecation messages on macOS
-#include "sphere.h"
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
@@ -46,7 +45,6 @@ private:
     bool initialised = false;
 
     GLuint m_sphere_vao;    // Stores id of sphere VAO
-    Sphere m_sphere;        // Stores sphere
     GLuint m_sphere_vbo;    // Stores id of sphere VBO
     std::vector<float> m_sphereData;
 
