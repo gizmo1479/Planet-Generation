@@ -1,6 +1,7 @@
 #pragma once
 
 // Defined before including GLEW to suppress deprecation messages on macOS
+#include "sphere.h"
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
@@ -44,9 +45,9 @@ private:
     GLuint m_shader;        // Stores id of shader program
     bool initialised = false;
 
+    Sphere m_sphere;        // Stores sphere
     GLuint m_sphere_vao;    // Stores id of sphere VAO
     GLuint m_sphere_vbo;    // Stores id of sphere VBO
-    std::vector<float> m_sphereData;
 
     void setSphereVBO();
     void rebuildCameraMatrices(int w, int h);
