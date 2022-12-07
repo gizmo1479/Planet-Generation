@@ -40,6 +40,7 @@ private:
     glm::mat4 m_model = glm::mat4(1);
     glm::mat4 m_view  = glm::mat4(1);
     glm::mat4 m_proj  = glm::mat4(1);
+    glm::vec3 m_eye;
 
     GLuint m_shader;        // Stores id of shader program
     bool initialised = false;
