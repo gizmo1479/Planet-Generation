@@ -42,6 +42,7 @@ add_executable(${PROJECT_NAME}
     src/utils/sceneparser.h
     src/utils/shaderloader.h
     src/sphere.h
+    src/textures/terraingenerator.h
 )
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
