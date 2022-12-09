@@ -27,11 +27,39 @@ void toonColor() {
     float spec = pow(clamp(dot(toCam, R), 0.f, 1.f), 25);
     spec = floor(spec*2) / 2;
 
-    fragColor = (diffuse + spec)*lightColor;
+    fragColor += (diffuse + spec)*lightColor;
+}
+
+void toonColor2() {
+    vec3 lightDir = normalize(vec3(4, 3, 6) - worldPosition);
+    float intensity = clamp(dot(lightDir, normalize(worldNormal)), 0.f, 1.f);
+    //float diffuse = smoothstep(0.f, fwidth(intensity), intensity); //
+    float diffuse = clamp(floor(intensity * 4) / 4, .15, 1.f);
+
+    vec3 R = reflect(-lightDir, normalize(worldNormal));
+    vec3 toCam = normalize(cameraPos - worldPosition);
+    float spec = pow(clamp(dot(toCam, R), 0.f, 1.f), 25);
+    spec = floor(spec*2) / 2;
+
+    vec4 c = (diffuse + spec)*lightColor;
+
+    if (c.x > fragColor.x || c.y > fragColor.y)
+        fragColor = (diffuse + spec)*lightColor;
 }
 
 void phong() {
     vec3 lightDir = normalize(lightPos - worldPosition);
+    float d = clamp(dot(normalize(worldNormal), lightDir), 0.f, 1.f);
+    fragColor += d*lightColor*kd;
+
+    vec3 R = reflect(-lightDir, normalize(worldNormal));
+    vec3 toCam = normalize(cameraPos - worldPosition);
+    float spec = pow(clamp(dot(toCam, R), 0.f, 1.f), 25);
+    fragColor += ks*spec*lightColor;
+}
+
+void phong2() {
+    vec3 lightDir = normalize(vec3(4, 3, 6) - worldPosition);
     float d = clamp(dot(normalize(worldNormal), lightDir), 0.f, 1.f);
     fragColor += d*lightColor*kd;
 
@@ -48,5 +76,7 @@ void main() {
 
    // fragColor = vec4(abs(N));
     toonColor();
-   // phong();
+    //toonColor2();
+//    phong();
+//    phong2();
 }
