@@ -91,17 +91,25 @@ void MainWindow::initialize() {
     vLayout->addWidget(p2Layout);
 
     vLayout->addWidget(shaders_label);
-    addCheckBox(vLayout, "Outlines", false, [this] { settings.outlines = !settings.outlines; });
-    addRadioButton(vLayout, "Phong", settings.shader == SHADER_PHONG, [this] { setShaderType(SHADER_PHONG); });
-    addRadioButton(vLayout, "Toon Shader", settings.shader == SHADER_TOON, [this] { setShaderType(SHADER_TOON); });
+    QGroupBox *shaderGroup = new QGroupBox();
+    QVBoxLayout *shaderLayout = new QVBoxLayout();
+    addCheckBox(shaderLayout, "Outlines", false, [this] { settings.outlines = !settings.outlines; });
+    addRadioButton(shaderLayout, "Phong", settings.shader == SHADER_PHONG, [this] { setShaderType(SHADER_PHONG); });
+    addRadioButton(shaderLayout, "Toon Shader", settings.shader == SHADER_TOON, [this] { setShaderType(SHADER_TOON); });
+    shaderGroup->setLayout(shaderLayout);
+    vLayout->addWidget(shaderGroup);
 
     vLayout->addWidget(brushes_label);
-    addPushButton(vLayout, "Clear canvas", &MainWindow::onClearButtonClick);
-    addSpinBox(vLayout, "radius", 1, 100, 1, settings.brushRadius, [this](int value){ setIntVal(settings.brushRadius, value); });
-    addRadioButton(vLayout, "Water", settings.brushTerrain == TERRAIN_WATER, [this]{ setTerrainType(TERRAIN_WATER); });
-    addRadioButton(vLayout, "Flatlands", settings.brushTerrain == TERRAIN_FLATLANDS, [this]{ setTerrainType(TERRAIN_FLATLANDS); });
-    addPushButton(vLayout, "Save Map", &MainWindow::onSaveButtonClick);
-    addPushButton(vLayout, "Load Map", &MainWindow::onUploadButtonClick);
+    QGroupBox *brushesGroup = new QGroupBox();
+    QVBoxLayout *brushesLayout = new QVBoxLayout();
+    addPushButton(brushesLayout, "Clear canvas", &MainWindow::onClearButtonClick);
+    addSpinBox(brushesLayout, "radius", 1, 100, 1, settings.brushRadius, [this](int value){ setIntVal(settings.brushRadius, value); });
+    addRadioButton(brushesLayout, "Water", settings.brushTerrain == TERRAIN_WATER, [this]{ setTerrainType(TERRAIN_WATER); });
+    addRadioButton(brushesLayout, "Flatlands", settings.brushTerrain == TERRAIN_FLATLANDS, [this]{ setTerrainType(TERRAIN_FLATLANDS); });
+    addPushButton(brushesLayout, "Save Map", &MainWindow::onSaveButtonClick);
+    addPushButton(brushesLayout, "Load Map", &MainWindow::onUploadButtonClick);
+    brushesGroup->setLayout(brushesLayout);
+    vLayout->addWidget(brushesGroup);
     connectUIElements();
 
     // Set default values of 5 for tesselation parameters
