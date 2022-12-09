@@ -37,6 +37,8 @@ private:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
+    void updateView();
 
     glm::mat4 m_model = glm::mat4(1);
     glm::mat4 m_view  = glm::mat4(1);
@@ -50,12 +52,23 @@ private:
     GLuint m_sphere_vao;    // Stores id of sphere VAO
     GLuint m_sphere_vbo;    // Stores id of sphere VBO
 
+    void initSphere();
     void setSphereVBO();
+    void delSphere();
     void rebuildCameraMatrices(int w, int h);
+    void sendUniforms();
+
+    /*** OUTLINE STUFF ***/
+    GLuint m_outline_vbo;
+    GLuint m_outline_vao;
+    GLuint m_outline_shader;
+    void paintOutline();
+    bool outline;
 
     float  m_angleX;
     float  m_angleY;
     float  m_zoom;
+    QPoint m_prevMousePos;
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
