@@ -20,6 +20,7 @@ void Settings::loadSettingsOrDefaults() {
     brushColor.a = s.value("brushAlpha", 255).toInt();
     brushDensity = s.value("brushDensity", 5).toInt();
     fixAlphaBlending = s.value("fixAlphaBlending", false).toBool();
+    outlines = s.value("outlines", false).toBool();
 
     filterType = s.value("filterType", FILTER_EDGE_DETECT).toInt();
     edgeDetectSensitivity = s.value("edgeDetectSensitivity", 0.5f).toDouble();
@@ -48,6 +49,7 @@ void Settings::saveSettings() {
     s.setValue("brushType", brushType);
     s.setValue("brushTerrain", brushTerrain);
     s.setValue("shader", shader);
+    s.setValue("outlines", outlines);
     s.setValue("brushRadius", brushRadius);
     s.setValue("brushRed", brushColor.r);
     s.setValue("brushGreen", brushColor.g);

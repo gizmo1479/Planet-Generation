@@ -63,7 +63,7 @@ private:
     GLuint m_outline_vao;
     GLuint m_outline_shader;
     void paintOutline();
-    bool outline;
+    bool outline = true;
 
     float  m_angleX;
     float  m_angleY;

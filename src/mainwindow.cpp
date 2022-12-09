@@ -93,7 +93,7 @@ void MainWindow::initialize() {
     vLayout->addWidget(shaders_label);
     QGroupBox *shaderGroup = new QGroupBox();
     QVBoxLayout *shaderLayout = new QVBoxLayout();
-    addCheckBox(shaderLayout, "Outlines", false, [this] { settings.outlines = !settings.outlines; });
+    addCheckBox(shaderLayout, "Outlines", settings.outlines, [this] { settings.outlines = !settings.outlines; });
     addRadioButton(shaderLayout, "Phong", settings.shader == SHADER_PHONG, [this] { setShaderType(SHADER_PHONG); });
     addRadioButton(shaderLayout, "Toon Shader", settings.shader == SHADER_TOON, [this] { setShaderType(SHADER_TOON); });
     shaderGroup->setLayout(shaderLayout);

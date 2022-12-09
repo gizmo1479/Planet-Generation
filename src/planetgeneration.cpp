@@ -134,7 +134,7 @@ void PlanetGeneration::initializeGL() {
 void PlanetGeneration::paintGL() {
     // Students: anything requiring OpenGL calls every frame should be done here
     if (initialised) {
-        if (outline) {
+        if (true) {
             paintOutline();
             return;
         }
@@ -244,6 +244,9 @@ void PlanetGeneration::sendUniforms() {
 
     auto camPosLoc = glGetUniformLocation(m_shader, "cameraPos");
     glUniform3fv(camPosLoc, 1, &m_eye[0]);
+
+    GLint shader = glGetUniformLocation(m_shader, "shader");
+    glUniform1i(shader, settings.shader);
 }
 
 
