@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <iostream>
 #include "glm/gtx/transform.hpp"
+#include "glm/gtx/string_cast.hpp"
 #include "settings.h"
 #include <utils/shaderloader.h>
 
@@ -116,6 +117,9 @@ void PlanetGeneration::paintGL() {
         GLint projectionMatrix = glGetUniformLocation(m_shader, "projectionMatrix");
         glUniformMatrix4fv(projectionMatrix, 1, GL_FALSE, &m_proj[0][0]);
 
+        auto camPosLoc = glGetUniformLocation(m_shader, "cameraPos");
+        glUniform3fv(camPosLoc, 1, &m_eye[0]);
+
         glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
         glBindVertexArray(0);
         glUseProgram(0);
@@ -135,7 +139,9 @@ void PlanetGeneration::rebuildCameraMatrices(int w, int h)
   rot = glm::rotate(glm::radians(-10 * m_angleY), glm::cross(glm::vec3(0,0,1),eye));
   eye = glm::vec3(rot * glm::vec4(eye, 1));
 
+
   eye = eye * m_zoom;
+  m_eye = eye;
 
   m_view = glm::lookAt(eye,glm::vec3(0,0,0),glm::vec3(0,0,1));
 
