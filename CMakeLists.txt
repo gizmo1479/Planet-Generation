@@ -28,6 +28,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
 
     src/planetgeneration.cpp
+    src/canvas2d.cpp
     src/mainwindow.cpp
     src/settings.cpp
     src/utils/scenefilereader.cpp
@@ -37,6 +38,8 @@ add_executable(${PROJECT_NAME}
 
     src/mainwindow.h
     src/planetgeneration.h
+    src/rgba.h
+    src/canvas2d.h
     src/settings.h
     src/utils/scenedata.h
     src/utils/scenefilereader.h

@@ -3,8 +3,12 @@
 in vec3 worldPosition;
 in vec3 worldNormal;
 
-uniform bool toon;
+uniform int shader;
 uniform vec3 cameraPos;
+
+//Shader enums
+const int SHADER_PHONG = 0;
+const int SHADER_TOON = 1;
 
 // global phong vars
 const float kd = .5;
@@ -74,9 +78,6 @@ void main() {
     vec3 N3 = normalize(worldNormal);
     vec4 N = vec4(N3, 0.0);
 
-   // fragColor = vec4(abs(N));
-    toonColor();
-    //toonColor2();
-//    phong();
-//    phong2();
+    if (shader == SHADER_PHONG) phong();
+    if (shader == SHADER_TOON) toonColor();
 }

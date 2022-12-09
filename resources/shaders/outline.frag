@@ -47,7 +47,7 @@ void main() {
     vec4 N = vec4(N3, 0.0);
 
    // fragColor = vec4(abs(N));
-    //toonColor();
+//    toonColor();
     fragColor = vec4(0.f);
    // phong();
 }
