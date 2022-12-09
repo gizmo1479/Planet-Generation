@@ -1,4 +1,5 @@
 #include "sphere.h"
+#include <algorithm>
 
 void Sphere::updateParams(int param1, int param2) {
     m_vertexData = std::vector<float>();
@@ -7,6 +8,12 @@ void Sphere::updateParams(int param1, int param2) {
     if (m_param1 < 2) m_param1 = 2;
     if (m_param2 < 3) m_param2 = 3;
     setVertexData();
+}
+
+std::vector<float> Sphere::generateShapeScale(float scale) {
+    auto d = m_vertexData;
+    std::transform(d.begin(), d.end(), d.begin(), [&](float c) {return c * scale;});
+    return d;
 }
 
 glm::vec3 Sphere::getNormal(glm::vec3 vec) {
