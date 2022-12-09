@@ -8,6 +8,7 @@ class Sphere
 public:
     void updateParams(int param1, int param2);
     std::vector<float> generateShape() { return m_vertexData; }
+    std::vector<float> generateShapeScale(float scale);
 
 private:
     void insertVec3(std::vector<float> &data, glm::vec3 v);
