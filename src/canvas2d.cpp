@@ -15,6 +15,7 @@ void Canvas2D::init() {
     m_mask.resize(pow(2 * settings.brushRadius + 1, 2));
     if (settings.brushTerrain == TERRAIN_WATER) settings.brushColor  = {0, 0, 128, 255};
     else if (settings.brushTerrain == TERRAIN_FLATLANDS) settings.brushColor = {0, 255, 0, 255};
+
     fillMask();
     m_smudge.resize(pow(2 * settings.brushRadius + 1, 2));
     clearCanvas();
@@ -262,12 +263,13 @@ void Canvas2D::fillSmudge(int x, int y) {
  * @brief Fills the mask with the appropriate opacity values
  */
 void Canvas2D::fillMask(){
-    cur_brush = settings.brushType;
+    cur_brush = BRUSH_CONSTANT;
+    settings.brushType = BRUSH_CONSTANT;
     cur_radius = settings.brushRadius;
     for (int i = 0; i < m_mask.size(); i++) {
         float dist = distance(i);
         float opacity;
-        switch (settings.brushType) {
+        switch (cur_brush) {
         case BRUSH_CONSTANT:
             if (dist <= settings.brushRadius) {
                 opacity = 1;
@@ -320,6 +322,7 @@ void Canvas2D::maskToCanvas(int x, int y) {
                 int mask_index = posToIndex(m, n, 2 * settings.brushRadius + 1);
                 float opacity = m_mask[mask_index];
                 RGBA new_color;
+
                 if (settings.brushType != BRUSH_SMUDGE) {
                     float alpha = ((float) settings.brushColor.a) / 255;
                     new_color = {(uint8_t) (((opacity * alpha) * settings.brushColor.r  + ((1 - (opacity * alpha)) * m_data[canvas_index].r))),
@@ -334,6 +337,7 @@ void Canvas2D::maskToCanvas(int x, int y) {
                                  255};
                     m_smudge[mask_index] = new_color;
                 }
+
                 m_data[canvas_index] = new_color;
             } else if (settings.brushType == BRUSH_SMUDGE) {
                 m_smudge[posToIndex(m, n, 2 * settings.brushRadius + 1)] = RGBA{0, 0, 0, 0};
