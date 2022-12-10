@@ -86,7 +86,8 @@ float TerrainGenerator::getHeight(float x, float y) {
     //    float y_mod = 1.5;
     //    float z = amp * computePerlin(x_mod * x * 5, y_mod * y * 5) / 2;
 
-    float z1 = 0.5 * computePerlin(0.5 * x * 5, 0.5 * y * 5) / 2;
+    float z1 = 0.75 * computePerlin(x, y) / 2;
+//    float z1 = 0.5 * computePerlin(0.5 * x * 5, 0.5 * y * 5) / 2;
 //    float z2 = 0.25 * computePerlin(1 * x * 5, 1 * y * 5) / 2;
 //    float z3 = 0.125 * computePerlin(2 * x * 5, 2 * y * 5) / 2;
 //    float z4 = 0.0625 * computePerlin(4 * x * 5, 4 * y * 5) / 2;
@@ -102,7 +103,8 @@ std::vector<float> TerrainGenerator::generateTerrain() {
     for(int x = 0; x < m_resolution; x++) {
         for(int y = 0; y < m_resolution; y++) {
             float h = getHeight(x,y);
-            heights.push_back(h);
+//            heights.push_back(h);
+            heights[x * m_resolution + y] = h;
         }
     }
     return heights;

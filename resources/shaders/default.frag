@@ -45,7 +45,7 @@ void main() {
     vec3 N3 = normalize(worldNormal);
     vec4 N = vec4(N3, 0.0);
 
-//    fragColor = vec4(abs(N));
+    fragColor = vec4(abs(N));
 //    toonColor();
-    phong();
+//    phong();
 }

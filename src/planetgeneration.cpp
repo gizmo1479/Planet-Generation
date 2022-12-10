@@ -136,12 +136,21 @@ void PlanetGeneration::initializeGL() {
     std::vector<GLfloat> heights = m_terrain.generateTerrain();
     int res = m_terrain.getResolution();
 
+    // Creds to chatgpt for the following code :D
+    // Generate a texture object and bind it to texture slot 0
     glGenTextures(1, &m_terrain_texture);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_FLOAT, res, res, 0, GL_FLOAT, GL_FLOAT, heights.data());
+
+    // Set the texture wrapping and filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Upload the displacement map texture data to OpenGL
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, res, res, 0, GL_RED, GL_UNSIGNED_BYTE, heights.data());
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_FLOAT, res, res, 0, GL_FLOAT, GL_FLOAT, heights.data());
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glUseProgram(m_shader);
@@ -155,10 +164,10 @@ void PlanetGeneration::initializeGL() {
 void PlanetGeneration::paintGL() {
     // Students: anything requiring OpenGL calls every frame should be done here
     if (initialised) {
-        if (outline) {
-            paintOutline();
-            return;
-        }
+//        if (outline) {
+//            paintOutline();
+//            return;
+//        }
 
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
