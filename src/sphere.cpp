@@ -1,6 +1,8 @@
 #include "sphere.h"
 #include <algorithm>
 
+// TODO: REMOVE NORMAL SHIT WE DON'T NEED IT
+
 void Sphere::updateParams(int param1, int param2) {
     m_vertexData = std::vector<float>();
     m_param1 = param1;
@@ -21,22 +23,54 @@ glm::vec3 Sphere::getNormal(glm::vec3 vec) {
     return glm::normalize(glm::vec3{ 2 * vec.x, 2 * vec.y, 2 * vec.z });
 }
 
+glm::vec2 Sphere::uv(glm::vec3 point) {
+    float u = -1;
+    float v = -1;
+
+    if ((point.y == 0.0f) || (point.y == 1.0f)) {
+        u = 0.5f;
+    } else {
+        float meep = atan2(point.z, point.x);
+        if (meep < 0) {
+            u = -meep / (2.f * M_PI);
+        } else {
+            u = 1 - (meep / (2.f * M_PI));
+        }
+    }
+
+    float meep2 = glm::asin(point.y / m_radius);
+    v = (meep2 / M_PI) + 0.5f;
+
+    return glm::vec2(u, v);
+}
+
 void Sphere::makeTile(glm::vec3 topLeft,
                       glm::vec3 topRight,
                       glm::vec3 bottomLeft,
                       glm::vec3 bottomRight) {
     insertVec3(m_vertexData, topLeft);
     insertVec3(m_vertexData, getNormal(topLeft));
+    insertVec2(m_vertexData, uv(topLeft));
+
     insertVec3(m_vertexData, bottomLeft);
     insertVec3(m_vertexData, getNormal(bottomLeft));
+    insertVec2(m_vertexData, uv(bottomLeft));
+
     insertVec3(m_vertexData, bottomRight);
     insertVec3(m_vertexData, getNormal(bottomRight));
+    insertVec2(m_vertexData, uv(bottomRight));
+
     insertVec3(m_vertexData, topLeft);
     insertVec3(m_vertexData, getNormal(topLeft));
+    insertVec2(m_vertexData, uv(topLeft));
+
     insertVec3(m_vertexData, bottomRight);
     insertVec3(m_vertexData, getNormal(bottomRight));
+    insertVec2(m_vertexData, uv(bottomRight));
+
     insertVec3(m_vertexData, topRight);
     insertVec3(m_vertexData, getNormal(topRight));
+    insertVec2(m_vertexData, uv(topRight));
 }
 
 glm::vec3 getXYZ(float theta, float phi, float r) {
@@ -86,4 +120,10 @@ void Sphere::insertVec3(std::vector<float> &data, glm::vec3 v) {
     data.push_back(v.x);
     data.push_back(v.y);
     data.push_back(v.z);
+}
+
+// Inserts a glm::vec2 into a vector of floats.
+void Sphere::insertVec2(std::vector<float> &data, glm::vec2 v) {
+    data.push_back(v.x);
+    data.push_back(v.y);
 }

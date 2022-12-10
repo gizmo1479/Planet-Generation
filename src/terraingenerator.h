@@ -9,7 +9,7 @@ public:
     TerrainGenerator();
     ~TerrainGenerator();
     int getResolution() { return m_resolution; };
-    std::vector<float> generateTerrain(std::vector<glm::vec4> canvas);
+    std::vector<float> generateTerrain();
 
 private:
     // Member variables for terrain generation. You will not need to use these directly.
@@ -29,10 +29,7 @@ private:
     float getHeight(float x, float y);
 
     // Computes the normal of a vertex by averaging neighbors
-    glm::vec3 getNormal(int row, int col);
-
-    // Computes color of vertex using normal and, optionally, position
-    glm::vec3 getColor(glm::vec3 normal, glm::vec3 position);
+//    glm::vec3 getNormal(int row, int col);
 
     // Computes the intensity of Perlin noise at some point
     float computePerlin(float x, float y);

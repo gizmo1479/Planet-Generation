@@ -26,7 +26,6 @@ PlanetGeneration::PlanetGeneration(QWidget *parent)
     m_keyMap[Qt::Key_Control] = false;
     m_keyMap[Qt::Key_Space]   = false;
 
-    // If you must use this function, do not edit anything above this
     rebuildCameraMatrices(this->width(), this->height());
 }
 
@@ -34,7 +33,6 @@ void PlanetGeneration::finish() {
     killTimer(m_timer);
     this->makeCurrent();
 
-    // Students: anything requiring OpenGL calls when the program exits should be done here
     glDeleteBuffers(1, &m_sphere_vbo);
     glDeleteVertexArrays(1, &m_sphere_vao);
 
@@ -42,7 +40,6 @@ void PlanetGeneration::finish() {
 }
 
 void PlanetGeneration::initSphere() {
-
     // initialise sphere vbo and vao
     glGenBuffers(1, &m_sphere_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_sphere_vbo);
@@ -51,13 +48,15 @@ void PlanetGeneration::initSphere() {
     glGenVertexArrays(1, &m_sphere_vao);
     glBindVertexArray(m_sphere_vao);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void*>(6 * sizeof(GLfloat)));
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // TODO: do outline stuff
+    // initialise outline stuff
     glGenBuffers(1, &m_outline_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_outline_vbo);
     auto sphereScale = m_sphere.generateShapeScale(1.05); // TODO: change if needed
@@ -128,6 +127,24 @@ void PlanetGeneration::initializeGL() {
     m_sphere.updateParams(settings.shapeParameter1, settings.shapeParameter2);
     initSphere();
 
+    // Initialise terrain default data and texture
+//    m_terrain = TerrainGenerator();
+    std::vector<GLfloat> heights = m_terrain.generateTerrain();
+    int res = m_terrain.getResolution();
+
+    glGenTextures(1, &m_terrain_texture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_FLOAT, res, res, 0, GL_FLOAT, GL_UNSIGNED_BYTE, heights.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    GLuint texture = glGetUniformLocation(m_shader, "texture_sampler");
+    glUniform1i(texture, 0);
+    glUseProgram(0);
+
     initialised = true;
 }
 
@@ -187,8 +204,6 @@ void PlanetGeneration::paintOutline() {
 
 void PlanetGeneration::rebuildCameraMatrices(int w, int h)
 {
-  // Update view matrix by rotating eye vector based on x and y angles
-
   // Create a new view matrix
   m_view = glm::mat4(1);
   glm::mat4 rot = glm::rotate(glm::radians(-10 * m_angleX), glm::vec3(0,0,1));
@@ -207,7 +222,6 @@ void PlanetGeneration::rebuildCameraMatrices(int w, int h)
 
   update();
 }
-
 
 void PlanetGeneration::resizeGL(int w, int h) {
     // Tells OpenGL how big the screen is
@@ -230,7 +244,6 @@ void PlanetGeneration::settingsChanged() {
     update(); // asks for a PaintGL() call to occur
 }
 
-
 void PlanetGeneration::sendUniforms() {
 
     GLint modelMatrix = glGetUniformLocation(m_shader, "modelMatrix");
@@ -245,7 +258,6 @@ void PlanetGeneration::sendUniforms() {
     auto camPosLoc = glGetUniformLocation(m_shader, "cameraPos");
     glUniform3fv(camPosLoc, 1, &m_eye[0]);
 }
-
 
 /******** EVENT HANDLING **********/
 
@@ -278,7 +290,6 @@ void PlanetGeneration::mouseMoveEvent(QMouseEvent *event) {
 
 }
 
-
 void PlanetGeneration::timerEvent(QTimerEvent *event) {
     int elapsedms   = m_elapsedTimer.elapsed();
     float deltaTime = elapsedms * 0.001f;
@@ -293,7 +304,6 @@ void PlanetGeneration::wheelEvent(QWheelEvent *event) {
     m_zoom -= event->angleDelta().y() / 100.f;
     rebuildCameraMatrices(width(), height());
 }
-
 
 void PlanetGeneration::updateView() {
     m_view =

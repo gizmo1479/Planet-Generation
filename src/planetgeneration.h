@@ -2,6 +2,7 @@
 
 // Defined before including GLEW to suppress deprecation messages on macOS
 #include "sphere.h"
+#include "terraingenerator.h"
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
@@ -51,6 +52,11 @@ private:
     Sphere m_sphere;        // Stores sphere
     GLuint m_sphere_vao;    // Stores id of sphere VAO
     GLuint m_sphere_vbo;    // Stores id of sphere VBO
+
+    TerrainGenerator m_terrain;
+    GLuint m_terrain_texture;
+//    GLuint m_terrain_vbo;
+//    GLuint m_terrain_vao;
 
     void initSphere();
     void setSphereVBO();

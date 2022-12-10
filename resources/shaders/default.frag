@@ -13,7 +13,6 @@ const float ks = .5;
 const vec3 lightPos = vec3(4, -3, 0);
 vec4 lightColor = vec4(.5, .5, 1.f, 1.0);
 
-
 out vec4 fragColor;
 
 void toonColor() {
@@ -46,7 +45,7 @@ void main() {
     vec3 N3 = normalize(worldNormal);
     vec4 N = vec4(N3, 0.0);
 
-   // fragColor = vec4(abs(N));
-    toonColor();
-   // phong();
+//    fragColor = vec4(abs(N));
+//    toonColor();
+    phong();
 }
