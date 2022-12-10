@@ -141,7 +141,8 @@ void PlanetGeneration::initializeGL() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glUseProgram(m_shader);
-    GLuint texture = glGetUniformLocation(m_shader, "texture_sampler");
+    GLuint texture = glGetUniformLocation(m_shader, "height_map");
+    std::cout << "texture loc: " << texture << "\n";
     glUniform1i(texture, 0);
     glUseProgram(0);
 
@@ -164,8 +165,12 @@ void PlanetGeneration::paintGL() {
         glBindVertexArray(m_sphere_vao);
         sendUniforms();
 
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
+
         glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
 
+        glBindTexture(GL_TEXTURE_2D, 0);
         glBindVertexArray(0);
         glUseProgram(0);
     }
