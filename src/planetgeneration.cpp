@@ -134,7 +134,7 @@ void PlanetGeneration::initializeGL() {
 void PlanetGeneration::paintGL() {
     // Students: anything requiring OpenGL calls every frame should be done here
     if (initialised) {
-        if (true) {
+        if (settings.outlines) {
             paintOutline();
             return;
         }
