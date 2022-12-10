@@ -36,6 +36,11 @@ void PlanetGeneration::finish() {
     glDeleteBuffers(1, &m_sphere_vbo);
     glDeleteVertexArrays(1, &m_sphere_vao);
 
+    glDeleteTextures(1, &m_terrain_texture);
+
+    glDeleteProgram(m_shader);
+    glDeleteProgram(m_outline_shader);
+
     this->doneCurrent();
 }
 
@@ -135,14 +140,13 @@ void PlanetGeneration::initializeGL() {
     glGenTextures(1, &m_terrain_texture);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_FLOAT, res, res, 0, GL_FLOAT, GL_UNSIGNED_BYTE, heights.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_FLOAT, res, res, 0, GL_FLOAT, GL_FLOAT, heights.data());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glUseProgram(m_shader);
     GLuint texture = glGetUniformLocation(m_shader, "height_map");
-    std::cout << "texture loc: " << texture << "\n";
     glUniform1i(texture, 0);
     glUseProgram(0);
 
