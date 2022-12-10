@@ -33,8 +33,7 @@ void PlanetGeneration::finish() {
     killTimer(m_timer);
     this->makeCurrent();
 
-    glDeleteBuffers(1, &m_sphere_vbo);
-    glDeleteVertexArrays(1, &m_sphere_vao);
+    delSphere();
 
     glDeleteTextures(1, &m_terrain_texture);
 
