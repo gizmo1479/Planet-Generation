@@ -46,7 +46,7 @@ struct Settings {
     int shapeParameter1 = 1;
     int shapeParameter2 = 1;
     bool outlines;
-    int shader;
+    int shaderType;
 
     // Brush
     int brushType = BRUSH_CONSTANT;      // The user's selected brush @see BrushType

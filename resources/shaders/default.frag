@@ -3,7 +3,7 @@
 in vec3 worldPosition;
 in vec3 worldNormal;
 
-uniform int shader;
+uniform int shaderType;
 uniform vec3 cameraPos;
 
 //Shader enums
@@ -78,6 +78,6 @@ void main() {
     vec3 N3 = normalize(worldNormal);
     vec4 N = vec4(N3, 0.0);
 
-    if (shader == SHADER_PHONG) phong();
-    if (shader == SHADER_TOON) toonColor();
+    if (shaderType == SHADER_PHONG) phong();
+    if (shaderType == SHADER_TOON) toonColor();
 }

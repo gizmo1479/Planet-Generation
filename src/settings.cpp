@@ -12,7 +12,7 @@ void Settings::loadSettingsOrDefaults() {
 
     brushType = s.value("brushType", BRUSH_CONSTANT).toInt();
     brushTerrain = s.value("brushTerrain", TERRAIN_WATER).toInt();
-    shader = s.value("shader", SHADER_PHONG).toInt();
+    shaderType = s.value("shaderType", SHADER_PHONG).toInt();
     brushRadius = s.value("brushRadius", 10).toInt();
     brushColor.r = s.value("brushRed", 0).toInt();
     brushColor.g = s.value("brushGreen", 0).toInt();
@@ -48,7 +48,7 @@ void Settings::saveSettings() {
 
     s.setValue("brushType", brushType);
     s.setValue("brushTerrain", brushTerrain);
-    s.setValue("shader", shader);
+    s.setValue("shaderType", shaderType);
     s.setValue("outlines", outlines);
     s.setValue("brushRadius", brushRadius);
     s.setValue("brushRed", brushColor.r);

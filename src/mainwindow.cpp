@@ -94,8 +94,8 @@ void MainWindow::initialize() {
     QGroupBox *shaderGroup = new QGroupBox();
     QVBoxLayout *shaderLayout = new QVBoxLayout();
     addCheckBox(shaderLayout, "Outlines", settings.outlines, [this] { settings.outlines = !settings.outlines; });
-    addRadioButton(shaderLayout, "Phong", settings.shader == SHADER_PHONG, [this] { setShaderType(SHADER_PHONG); });
-    addRadioButton(shaderLayout, "Toon Shader", settings.shader == SHADER_TOON, [this] { setShaderType(SHADER_TOON); });
+    addRadioButton(shaderLayout, "Phong", settings.shaderType == SHADER_PHONG, [this] { setShaderType(SHADER_PHONG); });
+    addRadioButton(shaderLayout, "Toon Shader", settings.shaderType == SHADER_TOON, [this] { setShaderType(SHADER_TOON); });
     shaderGroup->setLayout(shaderLayout);
     vLayout->addWidget(shaderGroup);
 
@@ -247,7 +247,7 @@ void MainWindow::setFilterType(int type) {
 }
 
 void MainWindow::setShaderType(int type) {
-    settings.shader = type;
+    settings.shaderType = type;
 }
 
 void MainWindow::setTerrainType(int type) {

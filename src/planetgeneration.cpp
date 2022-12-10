@@ -121,7 +121,7 @@ void PlanetGeneration::initializeGL() {
     // Shader setup
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
     m_outline_shader =
-            ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/outline.frag");
+            ShaderLoader::createShaderProgram(":/resources/shaders/outline.vert", ":/resources/shaders/outline.frag");
 
     // Initialise sphere data and VBO/VAO
     m_sphere = Sphere();
@@ -145,7 +145,7 @@ void PlanetGeneration::paintGL() {
 
         glUseProgram(m_shader);
         glBindVertexArray(m_sphere_vao);
-        sendUniforms();
+        sendUniforms(&m_shader);
 
         glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
 
@@ -160,7 +160,7 @@ void PlanetGeneration::paintOutline() {
 
     glUseProgram(m_shader);
     glBindVertexArray(m_sphere_vao);
-    sendUniforms();
+    sendUniforms(&m_shader);
 
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);
@@ -171,7 +171,7 @@ void PlanetGeneration::paintOutline() {
     // do outline
     glUseProgram(m_outline_shader);
     glBindVertexArray(m_outline_vao);
-    sendUniforms();
+    sendUniforms(&m_outline_shader);
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00);
@@ -231,22 +231,22 @@ void PlanetGeneration::settingsChanged() {
 }
 
 
-void PlanetGeneration::sendUniforms() {
+void PlanetGeneration::sendUniforms(GLuint *shader) {
 
-    GLint modelMatrix = glGetUniformLocation(m_shader, "modelMatrix");
+    GLint modelMatrix = glGetUniformLocation(*shader, "modelMatrix");
     glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, &m_model[0][0]);
 
-    GLint viewMatrix = glGetUniformLocation(m_shader, "viewMatrix");
+    GLint viewMatrix = glGetUniformLocation(*shader, "viewMatrix");
     glUniformMatrix4fv(viewMatrix, 1, GL_FALSE, &m_view[0][0]);
 
-    GLint projectionMatrix = glGetUniformLocation(m_shader, "projectionMatrix");
+    GLint projectionMatrix = glGetUniformLocation(*shader, "projectionMatrix");
     glUniformMatrix4fv(projectionMatrix, 1, GL_FALSE, &m_proj[0][0]);
 
-    auto camPosLoc = glGetUniformLocation(m_shader, "cameraPos");
+    auto camPosLoc = glGetUniformLocation(*shader, "cameraPos");
     glUniform3fv(camPosLoc, 1, &m_eye[0]);
 
-    GLint shader = glGetUniformLocation(m_shader, "shader");
-    glUniform1i(shader, settings.shader);
+    GLint shaderType = glGetUniformLocation(*shader, "shaderType");
+    glUniform1i(shaderType, settings.shaderType);
 }
 
 

@@ -56,7 +56,7 @@ private:
     void setSphereVBO();
     void delSphere();
     void rebuildCameraMatrices(int w, int h);
-    void sendUniforms();
+    void sendUniforms(GLuint *shader);
 
     /*** OUTLINE STUFF ***/
     GLuint m_outline_vbo;
