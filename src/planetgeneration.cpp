@@ -52,11 +52,9 @@ void PlanetGeneration::initSphere() {
     glGenVertexArrays(1, &m_sphere_vao);
     glBindVertexArray(m_sphere_vao);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void*>(6 * sizeof(GLfloat)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -68,9 +66,9 @@ void PlanetGeneration::initSphere() {
     glGenVertexArrays(1, &m_outline_vao);
     glBindVertexArray(m_outline_vao);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -132,11 +130,10 @@ void PlanetGeneration::initializeGL() {
     initSphere();
 
     // Initialise terrain default data and texture
-//    m_terrain = TerrainGenerator();
     std::vector<GLfloat> heights = m_terrain.generateTerrain();
     int res = m_terrain.getResolution();
 
-    // Creds to chatgpt for the following code :D
+    // Creds to chatgpt for help with the following code :D
     // Generate a texture object and bind it to texture slot 0
     glGenTextures(1, &m_terrain_texture);
     glActiveTexture(GL_TEXTURE0);
@@ -150,7 +147,6 @@ void PlanetGeneration::initializeGL() {
 
     // Upload the displacement map texture data to OpenGL
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, res, res, 0, GL_RED, GL_UNSIGNED_BYTE, heights.data());
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_FLOAT, res, res, 0, GL_FLOAT, GL_FLOAT, heights.data());
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glUseProgram(m_shader);
@@ -164,10 +160,10 @@ void PlanetGeneration::initializeGL() {
 void PlanetGeneration::paintGL() {
     // Students: anything requiring OpenGL calls every frame should be done here
     if (initialised) {
-//        if (outline) {
-//            paintOutline();
-//            return;
-//        }
+        if (outline) {
+            paintOutline();
+            return;
+        }
 
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -198,7 +194,10 @@ void PlanetGeneration::paintOutline() {
 
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
     glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);
 
@@ -210,7 +209,10 @@ void PlanetGeneration::paintOutline() {
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00);
     glDisable(GL_DEPTH_TEST); // TODO: is this necessary?
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
     glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);
 
@@ -244,7 +246,6 @@ void PlanetGeneration::resizeGL(int w, int h) {
     // Tells OpenGL how big the screen is
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
-    // Students: anything requiring OpenGL calls when the program starts should be done here
     m_proj = glm::perspective(glm::radians(45.0), 1.0 * w / h, 0.01, 100.0);
 }
 

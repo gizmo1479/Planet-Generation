@@ -1,8 +1,6 @@
 #include "sphere.h"
 #include <algorithm>
 
-// TODO: REMOVE NORMAL SHIT WE DON'T NEED IT
-
 void Sphere::updateParams(int param1, int param2) {
     m_vertexData = std::vector<float>();
     m_param1 = param1;
@@ -12,15 +10,19 @@ void Sphere::updateParams(int param1, int param2) {
     setVertexData();
 }
 
+// TODO: not sure if this works for the UV coords...
 std::vector<float> Sphere::generateShapeScale(float scale) {
     auto d = m_vertexData;
-    std::transform(d.begin(), d.end(), d.begin(), [&](float c) {return c * scale;});
-    return d;
-}
+//    std::transform(d.begin(), d.end(), d.begin(), [&](float c) {return c * scale;});
+    for (int i = 0; i < m_vertexData.size(); i += 5) {
+        d.push_back(m_vertexData[i] * scale);
+        d.push_back(m_vertexData[i + 1] * scale);
+        d.push_back(m_vertexData[i + 2] * scale);
+        d.push_back(m_vertexData[i + 3]);
+        d.push_back(m_vertexData[i + 4]);
+    }
 
-glm::vec3 Sphere::getNormal(glm::vec3 vec) {
-    // { dx, dy, dz } = { 2x, 2y, 2z }
-    return glm::normalize(glm::vec3{ 2 * vec.x, 2 * vec.y, 2 * vec.z });
+    return d;
 }
 
 glm::vec2 Sphere::uv(glm::vec3 point) {
@@ -49,27 +51,21 @@ void Sphere::makeTile(glm::vec3 topLeft,
                       glm::vec3 bottomLeft,
                       glm::vec3 bottomRight) {
     insertVec3(m_vertexData, topLeft);
-    insertVec3(m_vertexData, getNormal(topLeft));
     insertVec2(m_vertexData, uv(topLeft));
 
     insertVec3(m_vertexData, bottomLeft);
-    insertVec3(m_vertexData, getNormal(bottomLeft));
     insertVec2(m_vertexData, uv(bottomLeft));
 
     insertVec3(m_vertexData, bottomRight);
-    insertVec3(m_vertexData, getNormal(bottomRight));
     insertVec2(m_vertexData, uv(bottomRight));
 
     insertVec3(m_vertexData, topLeft);
-    insertVec3(m_vertexData, getNormal(topLeft));
     insertVec2(m_vertexData, uv(topLeft));
 
     insertVec3(m_vertexData, bottomRight);
-    insertVec3(m_vertexData, getNormal(bottomRight));
     insertVec2(m_vertexData, uv(bottomRight));
 
     insertVec3(m_vertexData, topRight);
-    insertVec3(m_vertexData, getNormal(topRight));
     insertVec2(m_vertexData, uv(topRight));
 }
 
