@@ -116,13 +116,11 @@ void PlanetGeneration::initializeGL() {
     // Tells OpenGL how big the screen is
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
-    // Students: anything requiring OpenGL calls when the program starts should be done here
     glClearColor(.9, .9, .9, 1);
 
     // Shader setup
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
-    m_outline_shader =
-            ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/outline.frag");
+    m_outline_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/outline.frag");
 
     // Initialise sphere data and VBO/VAO
     m_sphere = Sphere();
@@ -133,7 +131,7 @@ void PlanetGeneration::initializeGL() {
     std::vector<GLfloat> heights = m_terrain.generateTerrain();
     int res = m_terrain.getResolution();
 
-    // Creds to chatgpt for help with the following code :D
+    /** Creds to chatgpt for help with the following code :D **/
     // Generate a texture object and bind it to texture slot 0
     glGenTextures(1, &m_terrain_texture);
     glActiveTexture(GL_TEXTURE0);
@@ -154,11 +152,13 @@ void PlanetGeneration::initializeGL() {
     glUniform1i(texture, 0);
     glUseProgram(0);
 
+    // initialise camera matrices
+    rebuildCameraMatrices(width(), height());
+
     initialised = true;
 }
 
 void PlanetGeneration::paintGL() {
-    // Students: anything requiring OpenGL calls every frame should be done here
     if (initialised) {
         if (outline) {
             paintOutline();
@@ -228,16 +228,14 @@ void PlanetGeneration::rebuildCameraMatrices(int w, int h)
   glm::mat4 rot = glm::rotate(glm::radians(-10 * m_angleX), glm::vec3(0,0,1));
   glm::vec3 eye = glm::vec3(2,0,0);
   eye = glm::vec3(rot * glm::vec4(eye, 1));
-
   rot = glm::rotate(glm::radians(-10 * m_angleY), glm::cross(glm::vec3(0,0,1),eye));
   eye = glm::vec3(rot * glm::vec4(eye, 1));
 
   eye = eye * m_zoom;
   m_eye = eye;
-
   m_view = glm::lookAt(eye,glm::vec3(0,0,0),glm::vec3(0,0,1));
-
   m_proj = glm::perspective(glm::radians(45.0), 1.0 * w / h, 0.01,100.0);
+  m_MVP = m_proj * m_view * m_model;
 
   update();
 }
@@ -247,6 +245,7 @@ void PlanetGeneration::resizeGL(int w, int h) {
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
     m_proj = glm::perspective(glm::radians(45.0), 1.0 * w / h, 0.01, 100.0);
+    m_MVP = m_proj * m_view * m_model;
 }
 
 void PlanetGeneration::sceneChanged() {
@@ -267,11 +266,8 @@ void PlanetGeneration::sendUniforms() {
     GLint modelMatrix = glGetUniformLocation(m_shader, "modelMatrix");
     glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, &m_model[0][0]);
 
-    GLint viewMatrix = glGetUniformLocation(m_shader, "viewMatrix");
-    glUniformMatrix4fv(viewMatrix, 1, GL_FALSE, &m_view[0][0]);
-
-    GLint projectionMatrix = glGetUniformLocation(m_shader, "projectionMatrix");
-    glUniformMatrix4fv(projectionMatrix, 1, GL_FALSE, &m_proj[0][0]);
+    GLint MVPMatrix = glGetUniformLocation(m_shader, "MVPMatrix");
+    glUniformMatrix4fv(MVPMatrix, 1, GL_FALSE, &m_MVP[0][0]);
 
     auto camPosLoc = glGetUniformLocation(m_shader, "cameraPos");
     glUniform3fv(camPosLoc, 1, &m_eye[0]);
@@ -305,7 +301,6 @@ void PlanetGeneration::mouseMoveEvent(QMouseEvent *event) {
         m_prevMousePos = event->pos();
         rebuildCameraMatrices(width(), height());
     }
-
 }
 
 void PlanetGeneration::timerEvent(QTimerEvent *event) {

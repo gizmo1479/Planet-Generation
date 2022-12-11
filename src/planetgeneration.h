@@ -41,26 +41,28 @@ private:
     void wheelEvent(QWheelEvent *event) override;
     void updateView();
 
-    glm::mat4 m_model = glm::mat4(1);
-    glm::mat4 m_view  = glm::mat4(1);
-    glm::mat4 m_proj  = glm::mat4(1);
+    glm::mat4 m_model   = glm::mat4(1);
+    glm::mat4 m_view    = glm::mat4(1);
+    glm::mat4 m_proj    = glm::mat4(1);
+    glm::mat4 m_MVP     = glm::mat4(1);
     glm::vec3 m_eye;
 
     GLuint m_shader;        // Stores id of shader program
     bool initialised = false;
 
+    // terrain generation/texture
+    TerrainGenerator m_terrain;
+    GLuint m_terrain_texture;
+
+    // sphere stuff
     Sphere m_sphere;        // Stores sphere
     GLuint m_sphere_vao;    // Stores id of sphere VAO
     GLuint m_sphere_vbo;    // Stores id of sphere VBO
-
-    TerrainGenerator m_terrain;
-    GLuint m_terrain_texture;
-//    GLuint m_terrain_vbo;
-//    GLuint m_terrain_vao;
-
     void initSphere();
     void setSphereVBO();
     void delSphere();
+
+    // misc helpers
     void rebuildCameraMatrices(int w, int h);
     void sendUniforms();
 
