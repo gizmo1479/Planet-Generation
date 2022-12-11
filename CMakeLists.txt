@@ -28,21 +28,26 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
 
     src/planetgeneration.cpp
+    src/canvas2d.cpp
     src/mainwindow.cpp
     src/settings.cpp
     src/utils/scenefilereader.cpp
     src/utils/sceneparser.cpp
     src/sphere.cpp
+    src/SkyBox/skybox.cpp
     src/terraingenerator.cpp
 
     src/mainwindow.h
     src/planetgeneration.h
+    src/rgba.h
+    src/canvas2d.h
     src/settings.h
     src/utils/scenedata.h
     src/utils/scenefilereader.h
     src/utils/sceneparser.h
     src/utils/shaderloader.h
     src/sphere.h
+    src/SkyBox/skybox.h
     src/terraingenerator.h
 )
 
@@ -71,6 +76,7 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/outline.frag
         resources/shaders/default.frag
         resources/shaders/default.vert
+        resources/shaders/outline.vert
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

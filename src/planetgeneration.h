@@ -64,14 +64,14 @@ private:
 
     // misc helpers
     void rebuildCameraMatrices(int w, int h);
-    void sendUniforms();
+    void sendUniforms(GLuint *shader);
 
     /*** OUTLINE STUFF ***/
     GLuint m_outline_vbo;
     GLuint m_outline_vao;
     GLuint m_outline_shader;
     void paintOutline();
-    bool outline;
+    bool outline = true;
 
     float  m_angleX;
     float  m_angleY;

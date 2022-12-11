@@ -122,6 +122,7 @@ void PlanetGeneration::initializeGL() {
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
     m_outline_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/outline.frag");
 
+
     // Initialise sphere data and VBO/VAO
     m_sphere = Sphere();
     m_sphere.updateParams(settings.shapeParameter1, settings.shapeParameter2);
@@ -160,7 +161,7 @@ void PlanetGeneration::initializeGL() {
 
 void PlanetGeneration::paintGL() {
     if (initialised) {
-        if (outline) {
+        if (settings.outlines) {
             paintOutline();
             return;
         }
@@ -171,7 +172,7 @@ void PlanetGeneration::paintGL() {
 
         glUseProgram(m_shader);
         glBindVertexArray(m_sphere_vao);
-        sendUniforms();
+        sendUniforms(&m_shader);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
@@ -190,7 +191,7 @@ void PlanetGeneration::paintOutline() {
 
     glUseProgram(m_shader);
     glBindVertexArray(m_sphere_vao);
-    sendUniforms();
+    sendUniforms(&m_shader);
 
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);
@@ -204,7 +205,7 @@ void PlanetGeneration::paintOutline() {
     // do outline
     glUseProgram(m_outline_shader);
     glBindVertexArray(m_outline_vao);
-    sendUniforms();
+    sendUniforms(&m_outline_shader);
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00);
@@ -261,16 +262,18 @@ void PlanetGeneration::settingsChanged() {
     update(); // asks for a PaintGL() call to occur
 }
 
-void PlanetGeneration::sendUniforms() {
-
-    GLint modelMatrix = glGetUniformLocation(m_shader, "modelMatrix");
+void PlanetGeneration::sendUniforms(GLuint *shader) {
+    GLint modelMatrix = glGetUniformLocation(*shader, "modelMatrix");
     glUniformMatrix4fv(modelMatrix, 1, GL_FALSE, &m_model[0][0]);
 
-    GLint MVPMatrix = glGetUniformLocation(m_shader, "MVPMatrix");
+    GLint MVPMatrix = glGetUniformLocation(*shader, "MVPMatrix");
     glUniformMatrix4fv(MVPMatrix, 1, GL_FALSE, &m_MVP[0][0]);
 
-    auto camPosLoc = glGetUniformLocation(m_shader, "cameraPos");
+    auto camPosLoc = glGetUniformLocation(*shader, "cameraPos");
     glUniform3fv(camPosLoc, 1, &m_eye[0]);
+
+    GLint shaderType = glGetUniformLocation(*shader, "shaderType");
+    glUniform1i(shaderType, settings.shaderType);
 }
 
 /******** EVENT HANDLING **********/

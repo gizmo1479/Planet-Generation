@@ -4,19 +4,25 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QSettings>
 #include <QLabel>
 #include <QGroupBox>
 #include <iostream>
 
 void MainWindow::initialize() {
+    settings.loadSettingsOrDefaults();
+
     planetgeneration = new PlanetGeneration;
 
     QHBoxLayout *hLayout = new QHBoxLayout; // horizontal alignment
     QVBoxLayout *vLayout = new QVBoxLayout(); // vertical alignment
     vLayout->setAlignment(Qt::AlignTop);
     hLayout->addLayout(vLayout);
+    planetgeneration->setMinimumWidth(500);
     hLayout->addWidget(planetgeneration, 1);
+    setupCanvas2D();
+    hLayout->addWidget(m_canvas, 2);
     this->setLayout(hLayout);
 
     // Create labels in sidebox
@@ -26,39 +32,16 @@ void MainWindow::initialize() {
     QLabel *tesselation_label = new QLabel(); // Parameters label
     tesselation_label->setText("Tesselation");
     tesselation_label->setFont(font);
-    QLabel *camera_label = new QLabel(); // Camera label
-    camera_label->setText("Camera");
-    camera_label->setFont(font);
-    QLabel *filters_label = new QLabel(); // Filters label
-    filters_label->setText("Filters");
-    filters_label->setFont(font);
-    QLabel *ec_label = new QLabel(); // Extra Credit label
-    ec_label->setText("Extra Credit");
-    ec_label->setFont(font);
+    QLabel *shaders_label = new QLabel(); // shaders label
+    shaders_label->setText("Shaders");
+    shaders_label->setFont(font);
+    QLabel *brushes_label = new QLabel(); // Filters label
+    brushes_label->setText("Terrain Brush");
+    brushes_label->setFont(font);
     QLabel *param1_label = new QLabel(); // Parameter 1 label
     param1_label->setText("Parameter 1:");
     QLabel *param2_label = new QLabel(); // Parameter 2 label
     param2_label->setText("Parameter 2:");
-    QLabel *near_label = new QLabel(); // Near plane label
-    near_label->setText("Near Plane:");
-    QLabel *far_label = new QLabel(); // Far plane label
-    far_label->setText("Far Plane:");
-
-
-
-    // Create checkbox for per-pixel filter
-    filter1 = new QCheckBox();
-    filter1->setText(QStringLiteral("Per-Pixel Filter"));
-    filter1->setChecked(false);
-
-    // Create checkbox for kernel-based filter
-    filter2 = new QCheckBox();
-    filter2->setText(QStringLiteral("Kernel-Based Filter"));
-    filter2->setChecked(false);
-
-    // Create file uploader for scene file
-    uploadFile = new QPushButton();
-    uploadFile->setText(QStringLiteral("Upload Scene File"));
 
     // Creates the boxes containing the parameter sliders and number boxes
     QGroupBox *p1Layout = new QGroupBox(); // horizonal slider 1 alignment
@@ -100,93 +83,50 @@ void MainWindow::initialize() {
     l2->addWidget(p2Box);
     p2Layout->setLayout(l2);
 
-    // Creates the boxes containing the camera sliders and number boxes
-    QGroupBox *nearLayout = new QGroupBox(); // horizonal near slider alignment
-    QHBoxLayout *lnear = new QHBoxLayout();
-    QGroupBox *farLayout = new QGroupBox(); // horizonal far slider alignment
-    QHBoxLayout *lfar = new QHBoxLayout();
-
-    // Create slider controls to control near/far planes
-    nearSlider = new QSlider(Qt::Orientation::Horizontal); // Near plane slider
-    nearSlider->setTickInterval(1);
-    nearSlider->setMinimum(1);
-    nearSlider->setMaximum(1000);
-    nearSlider->setValue(10);
-
-    nearBox = new QDoubleSpinBox();
-    nearBox->setMinimum(0.01f);
-    nearBox->setMaximum(10.f);
-    nearBox->setSingleStep(0.1f);
-    nearBox->setValue(0.1f);
-
-    farSlider = new QSlider(Qt::Orientation::Horizontal); // Far plane slider
-    farSlider->setTickInterval(1);
-    farSlider->setMinimum(1000);
-    farSlider->setMaximum(10000);
-    farSlider->setValue(10000);
-
-    farBox = new QDoubleSpinBox();
-    farBox->setMinimum(10.f);
-    farBox->setMaximum(100.f);
-    farBox->setSingleStep(0.1f);
-    farBox->setValue(100.f);
-
-    // Adds the slider and number box to the parameter layouts
-    lnear->addWidget(nearSlider);
-    lnear->addWidget(nearBox);
-    nearLayout->setLayout(lnear);
-
-    lfar->addWidget(farSlider);
-    lfar->addWidget(farBox);
-    farLayout->setLayout(lfar);
-
-    // Extra Credit:
-    ec1 = new QCheckBox();
-    ec1->setText(QStringLiteral("Extra Credit 1"));
-    ec1->setChecked(false);
-
-    ec2 = new QCheckBox();
-    ec2->setText(QStringLiteral("Extra Credit 2"));
-    ec2->setChecked(false);
-
-    ec3 = new QCheckBox();
-    ec3->setText(QStringLiteral("Extra Credit 3"));
-    ec3->setChecked(false);
-
-    ec4 = new QCheckBox();
-    ec4->setText(QStringLiteral("Extra Credit 4"));
-    ec4->setChecked(false);
-
-    vLayout->addWidget(uploadFile);
     vLayout->addWidget(tesselation_label);
+
     vLayout->addWidget(param1_label);
     vLayout->addWidget(p1Layout);
     vLayout->addWidget(param2_label);
     vLayout->addWidget(p2Layout);
-    vLayout->addWidget(camera_label);
-    vLayout->addWidget(near_label);
-    vLayout->addWidget(nearLayout);
-    vLayout->addWidget(far_label);
-    vLayout->addWidget(farLayout);
-    vLayout->addWidget(filters_label);
-    vLayout->addWidget(filter1);
-    vLayout->addWidget(filter2);
-    // Extra Credit:
-    vLayout->addWidget(ec_label);
-    vLayout->addWidget(ec1);
-    vLayout->addWidget(ec2);
-    vLayout->addWidget(ec3);
-    vLayout->addWidget(ec4);
 
+    vLayout->addWidget(shaders_label);
+    QGroupBox *shaderGroup = new QGroupBox();
+    QVBoxLayout *shaderLayout = new QVBoxLayout();
+    addCheckBox(shaderLayout, "Outlines", settings.outlines, [this] { settings.outlines = !settings.outlines; });
+    addRadioButton(shaderLayout, "Phong", settings.shaderType == SHADER_PHONG, [this] { setShaderType(SHADER_PHONG); });
+    addRadioButton(shaderLayout, "Toon Shader", settings.shaderType == SHADER_TOON, [this] { setShaderType(SHADER_TOON); });
+    shaderGroup->setLayout(shaderLayout);
+    vLayout->addWidget(shaderGroup);
+
+    vLayout->addWidget(brushes_label);
+    QGroupBox *brushesGroup = new QGroupBox();
+    QVBoxLayout *brushesLayout = new QVBoxLayout();
+    addPushButton(brushesLayout, "Clear canvas", &MainWindow::onClearButtonClick);
+    addSpinBox(brushesLayout, "radius", 1, 100, 1, settings.brushRadius, [this](int value){ setIntVal(settings.brushRadius, value); });
+    addRadioButton(brushesLayout, "Water", settings.brushTerrain == TERRAIN_WATER, [this]{ setTerrainType(TERRAIN_WATER); });
+    addRadioButton(brushesLayout, "Flatlands", settings.brushTerrain == TERRAIN_FLATLANDS, [this]{ setTerrainType(TERRAIN_FLATLANDS); });
+    addPushButton(brushesLayout, "Save Map", &MainWindow::onSaveButtonClick);
+    addPushButton(brushesLayout, "Load Map", &MainWindow::onUploadButtonClick);
+    brushesGroup->setLayout(brushesLayout);
+    vLayout->addWidget(brushesGroup);
     connectUIElements();
 
     // Set default values of 5 for tesselation parameters
     onValChangeP1(5);
     onValChangeP2(5);
+}
 
-    // Set default values for near and far planes
-    onValChangeNearBox(0.1f);
-    onValChangeFarBox(10.f);
+/**
+ * @brief Sets up Canvas2D
+ */
+void MainWindow::setupCanvas2D() {
+    m_canvas = new Canvas2D();
+    m_canvas->init();
+
+    if (!settings.imagePath.isEmpty()) {
+        m_canvas->loadImageFromFile(settings.imagePath);
+    }
 }
 
 void MainWindow::finish() {
@@ -195,26 +135,8 @@ void MainWindow::finish() {
 }
 
 void MainWindow::connectUIElements() {
-    connectPerPixelFilter();
-    connectKernelBasedFilter();
-    connectUploadFile();
     connectParam1();
     connectParam2();
-    connectNear();
-    connectFar();
-    connectExtraCredit();
-}
-
-void MainWindow::connectPerPixelFilter() {
-    connect(filter1, &QCheckBox::clicked, this, &MainWindow::onPerPixelFilter);
-}
-
-void MainWindow::connectKernelBasedFilter() {
-    connect(filter2, &QCheckBox::clicked, this, &MainWindow::onKernelBasedFilter);
-}
-
-void MainWindow::connectUploadFile() {
-    connect(uploadFile, &QPushButton::clicked, this, &MainWindow::onUploadFile);
 }
 
 void MainWindow::connectParam1() {
@@ -227,50 +149,6 @@ void MainWindow::connectParam2() {
     connect(p2Slider, &QSlider::valueChanged, this, &MainWindow::onValChangeP2);
     connect(p2Box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &MainWindow::onValChangeP2);
-}
-
-void MainWindow::connectNear() {
-    connect(nearSlider, &QSlider::valueChanged, this, &MainWindow::onValChangeNearSlider);
-    connect(nearBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &MainWindow::onValChangeNearBox);
-}
-
-void MainWindow::connectFar() {
-    connect(farSlider, &QSlider::valueChanged, this, &MainWindow::onValChangeFarSlider);
-    connect(farBox, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &MainWindow::onValChangeFarBox);
-}
-
-void MainWindow::connectExtraCredit() {
-    connect(ec1, &QCheckBox::clicked, this, &MainWindow::onExtraCredit1);
-    connect(ec2, &QCheckBox::clicked, this, &MainWindow::onExtraCredit2);
-    connect(ec3, &QCheckBox::clicked, this, &MainWindow::onExtraCredit3);
-    connect(ec4, &QCheckBox::clicked, this, &MainWindow::onExtraCredit4);
-}
-
-void MainWindow::onPerPixelFilter() {
-    settings.perPixelFilter = !settings.perPixelFilter;
-    planetgeneration->settingsChanged();
-}
-
-void MainWindow::onKernelBasedFilter() {
-    settings.kernelBasedFilter = !settings.kernelBasedFilter;
-    planetgeneration->settingsChanged();
-}
-
-void MainWindow::onUploadFile() {
-    // Get abs path of scene file
-    QString configFilePath = QFileDialog::getOpenFileName(this, tr("Upload File"), QDir::homePath(), tr("Scene Files (*.xml)"));
-    if (configFilePath.isNull()) {
-        std::cout << "Failed to load null scenefile." << std::endl;
-        return;
-    }
-
-    settings.sceneFilePath = configFilePath.toStdString();
-
-    std::cout << "Loaded scenefile: \"" << configFilePath.toStdString() << "\"." << std::endl;
-
-    planetgeneration->sceneChanged();
 }
 
 
@@ -288,52 +166,158 @@ void MainWindow::onValChangeP2(int newValue) {
     planetgeneration->settingsChanged();
 }
 
-void MainWindow::onValChangeNearSlider(int newValue) {
-    //nearSlider->setValue(newValue);
-    nearBox->setValue(newValue/100.f);
-    settings.nearPlane = nearBox->value();
-    planetgeneration->settingsChanged();
+// ------ FUNCTIONS FOR ADDING UI COMPONENTS ------
+
+void MainWindow::addHeading(QBoxLayout *layout, QString text) {
+    QFont font;
+    font.setPointSize(16);
+    font.setBold(true);
+
+    QLabel *label = new QLabel(text);
+    label->setFont(font);
+    layout->addWidget(label);
 }
 
-void MainWindow::onValChangeFarSlider(int newValue) {
-    //farSlider->setValue(newValue);
-    farBox->setValue(newValue/100.f);
-    settings.farPlane = farBox->value();
-    planetgeneration->settingsChanged();
+void MainWindow::addLabel(QBoxLayout *layout, QString text) {
+    layout->addWidget(new QLabel(text));
 }
 
-void MainWindow::onValChangeNearBox(double newValue) {
-    nearSlider->setValue(int(newValue*100.f));
-    //nearBox->setValue(newValue);
-    settings.nearPlane = nearBox->value();
-    planetgeneration->settingsChanged();
+void MainWindow::addRadioButton(QBoxLayout *layout, QString text, bool value, auto function) {
+    QRadioButton *button = new QRadioButton(text);
+    button->setChecked(value);
+    layout->addWidget(button);
+    connect(button, &QRadioButton::clicked, this, function);
 }
 
-void MainWindow::onValChangeFarBox(double newValue) {
-    farSlider->setValue(int(newValue*100.f));
-    //farBox->setValue(newValue);
-    settings.farPlane = farBox->value();
-    planetgeneration->settingsChanged();
+void MainWindow::addSpinBox(QBoxLayout *layout, QString text, int min, int max, int step, int val, auto function) {
+    QSpinBox *box = new QSpinBox();
+    box->setMinimum(min);
+    box->setMaximum(max);
+    box->setSingleStep(step);
+    box->setValue(val);
+    QHBoxLayout *subLayout = new QHBoxLayout();
+    addLabel(subLayout, text);
+    subLayout->addWidget(box);
+    layout->addLayout(subLayout);
+    connect(box, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, function);
 }
 
-// Extra Credit:
-
-void MainWindow::onExtraCredit1() {
-    settings.extraCredit1 = !settings.extraCredit1;
-    planetgeneration->settingsChanged();
+void MainWindow::addDoubleSpinBox(QBoxLayout *layout, QString text, double min, double max, double step, double val, int decimal, auto function) {
+    QDoubleSpinBox *box = new QDoubleSpinBox();
+    box->setMinimum(min);
+    box->setMaximum(max);
+    box->setSingleStep(step);
+    box->setValue(val);
+    box->setDecimals(decimal);
+    QHBoxLayout *subLayout = new QHBoxLayout();
+    addLabel(subLayout, text);
+    subLayout->addWidget(box);
+    layout->addLayout(subLayout);
+    connect(box, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, function);
 }
 
-void MainWindow::onExtraCredit2() {
-    settings.extraCredit2 = !settings.extraCredit2;
-    planetgeneration->settingsChanged();
+void MainWindow::addPushButton(QBoxLayout *layout, QString text, auto function) {
+    QPushButton *button = new QPushButton(text);
+    button->setMinimumWidth(140);
+    layout->addWidget(button);
+    connect(button, &QPushButton::clicked, this, function);
 }
 
-void MainWindow::onExtraCredit3() {
-    settings.extraCredit3 = !settings.extraCredit3;
-    planetgeneration->settingsChanged();
+void MainWindow::addCheckBox(QBoxLayout *layout, QString text, bool val, auto function) {
+    QCheckBox *box = new QCheckBox(text);
+    box->setChecked(val);
+    layout->addWidget(box);
+    connect(box, &QCheckBox::clicked, this, function);
 }
 
-void MainWindow::onExtraCredit4() {
-    settings.extraCredit4 = !settings.extraCredit4;
-    planetgeneration->settingsChanged();
+
+
+// ------ FUNCTIONS FOR UPDATING SETTINGS ------
+
+void MainWindow::setBrushType(int type) {
+    settings.brushType = type;
+    m_canvas->settingsChanged();
+}
+
+void MainWindow::setFilterType(int type) {
+    settings.filterType = type;
+    m_canvas->settingsChanged();
+}
+
+void MainWindow::setShaderType(int type) {
+    settings.shaderType = type;
+}
+
+void MainWindow::setTerrainType(int type) {
+    settings.brushTerrain = type;
+    m_canvas->settingsChanged();
+}
+
+void MainWindow::setUIntVal(std::uint8_t &setValue, int newValue) {
+    setValue = newValue;
+    m_canvas->settingsChanged();
+}
+
+void MainWindow::setIntVal(int &setValue, int newValue) {
+    setValue = newValue;
+    m_canvas->settingsChanged();
+}
+
+void MainWindow::setFloatVal(float &setValue, float newValue) {
+    setValue = newValue;
+    m_canvas->settingsChanged();
+}
+
+void MainWindow::setBoolVal(bool &setValue, bool newValue) {
+    setValue = newValue;
+    m_canvas->settingsChanged();
+}
+
+
+// ------ PUSH BUTTON FUNCTIONS ------
+
+void MainWindow::onClearButtonClick() {
+    m_canvas->clearCanvas();
+}
+
+void MainWindow::onFilterButtonClick() {
+    m_canvas->filterImage();
+}
+
+void MainWindow::onRevertButtonClick() {
+    m_canvas->loadImageFromFile(settings.imagePath);
+}
+
+void MainWindow::onUploadButtonClick() {
+    // Get new image path selected by user
+    QString file = QFileDialog::getOpenFileName(this, tr("Open Image"), QDir::homePath(), tr("Image Files (*.png *.jpg *.jpeg)"));
+    if (file.isEmpty()) { return; }
+    settings.imagePath = file;
+
+    // Display new image
+    m_canvas->loadImageFromFile(settings.imagePath);
+
+    m_canvas->settingsChanged();
+}
+
+void MainWindow::onSaveButtonClick() {
+    // Save drawn map
+    QByteArray* img = new QByteArray(reinterpret_cast<const char*>(m_canvas->m_data.data()), 4*m_canvas->m_data.size());
+    QImage now = QImage((const uchar*)img->data(), 500, 500, QImage::Format_RGBX8888);
+    QString dir = QFileDialog::getSaveFileName(this, tr("Save File"), "/home", tr("Images (*.png *.jpg)"));
+    if (dir.isNull()) {
+        std::cerr << "Error: failed to save image to \"" << dir.toStdString() << "\"" << std::endl;
+    } else {
+        bool success = now.save(dir);
+        if (!success) {
+            success = now.save(dir, "PNG");
+        }
+        if (success) {
+            std::cout << "Saved rendered image to \"" << dir.toStdString() << "\"" << std::endl;
+        } else {
+            std::cerr << "Error: failed to save image to \"" << dir.toStdString() << "\"" << std::endl;
+        }
+    }
 }
