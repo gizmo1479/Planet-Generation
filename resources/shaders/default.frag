@@ -17,7 +17,6 @@ const float ks = .5;
 const vec3 lightPos = vec3(4, -3, 0);
 vec4 lightColor = vec4(.5, .5, 1.f, 1.0);
 
-
 out vec4 fragColor;
 
 void toonColor() {

@@ -35,6 +35,7 @@ add_executable(${PROJECT_NAME}
     src/utils/sceneparser.cpp
     src/sphere.cpp
     src/SkyBox/skybox.cpp
+    src/terraingenerator.cpp
 
     src/mainwindow.h
     src/planetgeneration.h
@@ -47,6 +48,7 @@ add_executable(${PROJECT_NAME}
     src/utils/shaderloader.h
     src/sphere.h
     src/SkyBox/skybox.h
+    src/terraingenerator.h
 )
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
