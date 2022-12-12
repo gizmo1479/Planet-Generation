@@ -17,7 +17,7 @@ void Canvas2D::init() {
     else if (settings.brushTerrain == TERRAIN_FLATLANDS) settings.brushColor = {0, 255, 0, 255};
 
     fillMask();
-    m_smudge.resize(pow(2 * settings.brushRadius + 1, 2));
+//    m_smudge.resize(pow(2 * settings.brushRadius + 1, 2));
     clearCanvas();
 }
 
@@ -387,8 +387,8 @@ bool Canvas2D::loadImageFromFile(const QString &file) {
  */
 void Canvas2D::displayImage() {
     QByteArray* img = new QByteArray(reinterpret_cast<const char*>(m_data.data()), 4*m_data.size());
-    QImage now = QImage((const uchar*)img->data(), m_width, m_height, QImage::Format_RGBX8888);
-    setPixmap(QPixmap::fromImage(now));
+    m_img = QImage((const uchar*)img->data(), m_width, m_height, QImage::Format_RGBX8888);
+    setPixmap(QPixmap::fromImage(m_img));
     setFixedSize(m_width, m_height);
     update();
 }

@@ -20,25 +20,22 @@ Skybox::~Skybox() {
 void Skybox::update(glm::mat4 view, glm::mat4 proj) {
     this->proj = proj;
     this->view = glm::mat4(glm::mat3(view));
-
-    glUseProgram(m_shader);
-    GLint viewLoc = glGetUniformLocation(m_shader, "view");
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-    GLint projLoc = glGetUniformLocation(m_shader, "proj");
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, &proj[0][0]);
-    glUseProgram(0);
 }
 
 void Skybox::paint() {
     glDepthFunc(GL_LEQUAL); // change depth func so depth test passes when vals are == to depth buffs contents
-    glUseProgram(m_shader);
+    glUseProgram(m_skybox_shader);
 
     // send projection, view mat, and sampler
-    GLuint tLoc = glGetUniformLocation(m_shader, "skybox");
+//    std::cout << "passing skybox uniforms\n";
+    GLuint tLoc = glGetUniformLocation(m_skybox_shader, "skybox");
+//    std::cout << "tLoc: " << tLoc << "\n";
     glUniform1i(tLoc, m_texSlot);
-    GLint viewLoc = glGetUniformLocation(m_shader, "view");
+    GLint viewLoc = glGetUniformLocation(m_skybox_shader, "view");
+//    std::cout << "viewLoc: " << viewLoc << "\n";
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-    GLint projLoc = glGetUniformLocation(m_shader, "proj");
+    GLint projLoc = glGetUniformLocation(m_skybox_shader, "proj");
+//    std::cout << "projLoc: " << projLoc << "\n";
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, &proj[0][0]);
 
     // do skybox cube
@@ -87,16 +84,12 @@ void Skybox::createTex() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-
-    m_shader = ShaderLoader::createShaderProgram(":resources/shaders/skybox.vert",
-                                                 ":resources/shaders/skybox.frag");
 }
 
 void Skybox::destroy() {
     glDeleteBuffers(1, &m_vbo);
     glDeleteVertexArrays(1, &m_vao);
-    glDeleteProgram(m_shader);
+//    glDeleteProgram(m_skybox_shader);
     glDeleteTextures(1, &m_tex);
 }
 
