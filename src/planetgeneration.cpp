@@ -157,9 +157,16 @@ void PlanetGeneration::initializeGL() {
     rebuildCameraMatrices(width(), height());
 
     // make skybox
-    auto s = "/home/gizmo1479/Pictures/cat-mountain.png";
-    std::array<std::string, 6> images = {s, s, s, s, s, s};
+    auto back = "/home/gizmo1479/Pictures/skybox2/back.jpg";
+    auto top = "/home/gizmo1479/Pictures/skybox2/top.jpg";
+    auto left = "/home/gizmo1479/Pictures/skybox2/left.jpg";
+    auto right = "/home/gizmo1479/Pictures/skybox2/right.jpg";
+    auto bottom = "/home/gizmo1479/Pictures/skybox2/bottom.jpg";
+    auto front = "/home/gizmo1479/Pictures/skybox2/front.jpg";
+    std::array<std::string, 6> images = {left, left, left, left, left, left};
     m_skybox = Skybox(images, 2, m_view, m_proj); // TODO: update tex slot if needed
+    m_skybox_shader = ShaderLoader::createShaderProgram(":resources/shaders/skybox.vert",
+                                                        ":resources/shaders/skybox.frag");
     initialised = true;
 }
 
@@ -186,9 +193,12 @@ void PlanetGeneration::paintGL() {
 
         // now draw the skybox where the sphere isnt
         m_skybox.update(m_view, m_proj);
-        m_skybox.paint();
+        m_skybox.paint(m_skybox_shader);
+
+        //paintSkybox();
     }
 }
+
 
 void PlanetGeneration::paintOutline() {
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);

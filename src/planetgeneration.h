@@ -76,6 +76,8 @@ private:
 
     /*** skybox ***/
     Skybox m_skybox;
+    GLuint m_skybox_shader;
+    void paintSkybox();
 
     float  m_angleX;
     float  m_angleY;
