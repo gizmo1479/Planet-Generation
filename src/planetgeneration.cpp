@@ -156,10 +156,6 @@ void PlanetGeneration::initializeGL() {
     // initialise camera matrices
     rebuildCameraMatrices(width(), height());
 
-    // make skybox
-    auto s = "/home/gizmo1479/Pictures/cat-mountain.png";
-    std::array<std::string, 6> images = {s, s, s, s, s, s};
-    m_skybox = Skybox(images, 2, m_view, m_proj); // TODO: update tex slot if needed
     initialised = true;
 }
 
@@ -170,7 +166,10 @@ void PlanetGeneration::paintGL() {
             return;
         }
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glStencilMask(0x00);
+
         glUseProgram(m_shader);
         glBindVertexArray(m_sphere_vao);
         sendUniforms(&m_shader);
@@ -183,10 +182,6 @@ void PlanetGeneration::paintGL() {
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindVertexArray(0);
         glUseProgram(0);
-
-        // now draw the skybox where the sphere isnt
-        m_skybox.update(m_view, m_proj);
-        m_skybox.paint();
     }
 }
 
