@@ -128,7 +128,6 @@ void PlanetGeneration::initializeGL() {
     // Initialise sphere data and VBO/VAO
     m_sphere = Sphere();
     m_sphere.updateParams(settings.shapeParameter1, settings.shapeParameter2);
-//    m_sphere.updateParams(25, 25);
     initSphere();
 
     // Initialise terrain default data and texture
@@ -212,10 +211,6 @@ void PlanetGeneration::paintGL() {
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
-
-//        glEnable(GL_TEXTURE_2D);
-//        glEnable(GL_TEXTURE0);
-//        glEnable(GL_TEXTURE1);
 
         glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 5);
 

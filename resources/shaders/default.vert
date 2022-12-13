@@ -5,6 +5,7 @@ layout(location = 1) in vec2 uv;
 
 out vec3 worldPosition;
 out vec3 worldNormal;
+out float height_offset;
 //out vec4 color;
 
 uniform mat4 modelMatrix;
@@ -12,8 +13,6 @@ uniform mat4 MVPMatrix;
 
 uniform sampler2D globe;
 uniform sampler2D height_map;
-
-out vec4 height_offset;
 
 void main() {
     vec4 objPos4 = vec4(objectPosition, 1);
@@ -25,13 +24,13 @@ void main() {
     vec4 globe_color = texture(globe, uv);
     // offset object position by height obtained from height map
     // vec4 offset = texture(height_map, uv).r * N4;
-    vec4 offset = 0.05f * texture2D(height_map, uv).r * N4;
+    vec4 offset = 0.1f * texture2D(height_map, uv).r * N4;
+    height_offset = 0.0f;
     
     if (globe_color.g != 0.0f) {
         finalPos = objPos4 + offset;
+        height_offset = length(offset);
     }
-
-    height_offset = offset;
 
     vec4 worldPos4 = modelMatrix * finalPos;
     worldPosition = worldPos4.xyz;

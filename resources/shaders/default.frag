@@ -2,6 +2,7 @@
 
 in vec3 worldPosition;
 in vec3 worldNormal;
+in float height_offset;
 //in vec4 color;
 
 uniform int shaderType;
@@ -19,8 +20,6 @@ const vec3 lightPos = vec3(4, -3, 0);
 vec4 lightColor = vec4(.5, .5, 1.f, 1.0);
 
 out vec4 fragColor;
-
-in vec4 height_offset;
 
 void toonColor() {
     vec3 lightDir = normalize(lightPos - worldPosition);
@@ -79,6 +78,17 @@ void main() {
     // Remember that you need to renormalize vectors here if you want them to be normalized
     vec3 N3 = normalize(worldNormal);
     vec4 N = vec4(N3, 0.0);
+
+    float water = 0.0f;
+    float sky = 0.04f;
+
+    if (height_offset <= water) {
+        lightColor = vec4(0.0f, 0.0f, 1.0f, 1.0);
+    } else if ((height_offset > water) && (height_offset < sky)) {
+        lightColor = vec4(0.0f, 1.0f, 0.0f, 1.0);
+    } else {
+        lightColor = vec4(1.0f, 1.0f, 1.0f, 1.0);
+    }
 
 //    fragColor = N;
 //    fragColor = vec4(1);
