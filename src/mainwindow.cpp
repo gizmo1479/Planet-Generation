@@ -22,7 +22,7 @@ void MainWindow::initialize() {
     planetgeneration->setMinimumWidth(500);
     hLayout->addWidget(planetgeneration, 1);
     setupCanvas2D();
-    hLayout->addWidget(m_canvas, 2);
+    hLayout->addWidget(planetgeneration->m_canvas, 2);
     this->setLayout(hLayout);
 
     // Create labels in sidebox
@@ -93,6 +93,7 @@ void MainWindow::initialize() {
     vLayout->addWidget(shaders_label);
     QGroupBox *shaderGroup = new QGroupBox();
     QVBoxLayout *shaderLayout = new QVBoxLayout();
+    addCheckBox(shaderLayout, "Skybox", settings.skybox, [this] { settings.skybox = !settings.skybox; });
     addCheckBox(shaderLayout, "Outlines", settings.outlines, [this] { settings.outlines = !settings.outlines; });
     addRadioButton(shaderLayout, "Phong", settings.shaderType == SHADER_PHONG, [this] { setShaderType(SHADER_PHONG); });
     addRadioButton(shaderLayout, "Toon Shader", settings.shaderType == SHADER_TOON, [this] { setShaderType(SHADER_TOON); });
@@ -102,7 +103,8 @@ void MainWindow::initialize() {
     vLayout->addWidget(brushes_label);
     QGroupBox *brushesGroup = new QGroupBox();
     QVBoxLayout *brushesLayout = new QVBoxLayout();
-    addPushButton(brushesLayout, "Clear canvas", &MainWindow::onClearButtonClick);
+    addPushButton(brushesLayout, "Clear Map", &MainWindow::onClearButtonClick);
+    addPushButton(brushesLayout, "Render Map", &::MainWindow::onRenderButtonClick);
     addSpinBox(brushesLayout, "radius", 1, 100, 1, settings.brushRadius, [this](int value){ setIntVal(settings.brushRadius, value); });
     addRadioButton(brushesLayout, "Water", settings.brushTerrain == TERRAIN_WATER, [this]{ setTerrainType(TERRAIN_WATER); });
     addRadioButton(brushesLayout, "Flatlands", settings.brushTerrain == TERRAIN_FLATLANDS, [this]{ setTerrainType(TERRAIN_FLATLANDS); });
@@ -121,11 +123,11 @@ void MainWindow::initialize() {
  * @brief Sets up Canvas2D
  */
 void MainWindow::setupCanvas2D() {
-    m_canvas = new Canvas2D();
-    m_canvas->init();
+    planetgeneration->m_canvas = new Canvas2D();
+    planetgeneration->m_canvas->init();
 
     if (!settings.imagePath.isEmpty()) {
-        m_canvas->loadImageFromFile(settings.imagePath);
+        planetgeneration->m_canvas->loadImageFromFile(settings.imagePath);
     }
 }
 
@@ -238,12 +240,12 @@ void MainWindow::addCheckBox(QBoxLayout *layout, QString text, bool val, auto fu
 
 void MainWindow::setBrushType(int type) {
     settings.brushType = type;
-    m_canvas->settingsChanged();
+    planetgeneration->m_canvas->settingsChanged();
 }
 
 void MainWindow::setFilterType(int type) {
     settings.filterType = type;
-    m_canvas->settingsChanged();
+    planetgeneration->m_canvas->settingsChanged();
 }
 
 void MainWindow::setShaderType(int type) {
@@ -252,42 +254,44 @@ void MainWindow::setShaderType(int type) {
 
 void MainWindow::setTerrainType(int type) {
     settings.brushTerrain = type;
-    m_canvas->settingsChanged();
+   planetgeneration->m_canvas->settingsChanged();
 }
 
 void MainWindow::setUIntVal(std::uint8_t &setValue, int newValue) {
     setValue = newValue;
-    m_canvas->settingsChanged();
+    planetgeneration->m_canvas->settingsChanged();
 }
 
 void MainWindow::setIntVal(int &setValue, int newValue) {
     setValue = newValue;
-    m_canvas->settingsChanged();
+    planetgeneration->m_canvas->settingsChanged();
 }
 
 void MainWindow::setFloatVal(float &setValue, float newValue) {
     setValue = newValue;
-    m_canvas->settingsChanged();
+    planetgeneration->m_canvas->settingsChanged();
 }
 
 void MainWindow::setBoolVal(bool &setValue, bool newValue) {
     setValue = newValue;
-    m_canvas->settingsChanged();
+    planetgeneration->m_canvas->settingsChanged();
 }
 
 
 // ------ PUSH BUTTON FUNCTIONS ------
-
+void MainWindow::onRenderButtonClick() {
+    planetgeneration->paintCanvas();
+}
 void MainWindow::onClearButtonClick() {
-    m_canvas->clearCanvas();
+    planetgeneration->m_canvas->clearCanvas();
 }
 
 void MainWindow::onFilterButtonClick() {
-    m_canvas->filterImage();
+    planetgeneration->m_canvas->filterImage();
 }
 
 void MainWindow::onRevertButtonClick() {
-    m_canvas->loadImageFromFile(settings.imagePath);
+    planetgeneration->m_canvas->loadImageFromFile(settings.imagePath);
 }
 
 void MainWindow::onUploadButtonClick() {
@@ -297,14 +301,14 @@ void MainWindow::onUploadButtonClick() {
     settings.imagePath = file;
 
     // Display new image
-    m_canvas->loadImageFromFile(settings.imagePath);
+    planetgeneration->m_canvas->loadImageFromFile(settings.imagePath);
 
-    m_canvas->settingsChanged();
+    planetgeneration->m_canvas->settingsChanged();
 }
 
 void MainWindow::onSaveButtonClick() {
     // Save drawn map
-    QByteArray* img = new QByteArray(reinterpret_cast<const char*>(m_canvas->m_data.data()), 4*m_canvas->m_data.size());
+    QByteArray* img = new QByteArray(reinterpret_cast<const char*>(planetgeneration->m_canvas->m_data.data()), 4*planetgeneration->m_canvas->m_data.size());
     QImage now = QImage((const uchar*)img->data(), 500, 500, QImage::Format_RGBX8888);
     QString dir = QFileDialog::getSaveFileName(this, tr("Save File"), "/home", tr("Images (*.png *.jpg)"));
     if (dir.isNull()) {

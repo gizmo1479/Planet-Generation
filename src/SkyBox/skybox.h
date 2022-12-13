@@ -6,7 +6,7 @@
 #include <string>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-
+#include <QOpenGLWidget>
 
 class Skybox
 {
@@ -22,7 +22,6 @@ public:
     int texSlot;
 
     glm::mat4 view, proj;
-
 private:
     void createTex();
     void createData();
@@ -30,7 +29,6 @@ private:
     std::vector<float> getVerts();
 
     std::array<std::string, 6> m_images;
-
 };
 
 #endif // SKYBOX_H

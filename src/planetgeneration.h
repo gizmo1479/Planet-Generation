@@ -1,6 +1,7 @@
 #pragma once
 
 // Defined before including GLEW to suppress deprecation messages on macOS
+#include "canvas2d.h"
 #include "sphere.h"
 #include "terraingenerator.h"
 #include "SkyBox/skybox.h"
@@ -23,7 +24,8 @@ public:
     void finish();                                      // Called on program exit
     void sceneChanged();
     void settingsChanged();
-
+    void paintCanvas();
+    Canvas2D *m_canvas;
 public slots:
     void tick(QTimerEvent* event);                      // Called once per tick of m_timer
 
@@ -54,6 +56,7 @@ private:
     // terrain generation/texture
     TerrainGenerator m_terrain;
     GLuint m_terrain_texture;
+    GLuint m_canvas_tex;
 
     // sphere stuff
     Sphere m_sphere;        // Stores sphere
@@ -77,7 +80,7 @@ private:
     /*** skybox ***/
     Skybox m_skybox;
     GLuint m_skybox_shader;
-    void paintSkybox();
+    // void paintSkybox();
 
     float  m_angleX;
     float  m_angleY;
