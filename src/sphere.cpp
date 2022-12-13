@@ -12,7 +12,7 @@ void Sphere::updateParams(int param1, int param2) {
 
 // TODO: not sure if this works for the UV coords...
 std::vector<float> Sphere::generateShapeScale(float scale) {
-    auto d = m_vertexData;
+    auto d = std::vector<float>();
 //    std::transform(d.begin(), d.end(), d.begin(), [&](float c) {return c * scale;});
     for (int i = 0; i < m_vertexData.size(); i += 5) {
         d.push_back(m_vertexData[i] * scale);
