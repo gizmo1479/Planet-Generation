@@ -1,6 +1,7 @@
 #include "terraingenerator.h"
 
 #include <cmath>
+#include <iostream>
 #include "glm/glm.hpp"
 
 // Constructor
@@ -81,18 +82,21 @@ float TerrainGenerator::computePerlin(float x, float y) {
 // Takes a normalized (x, y) position, in range [0,1)
 // Returns a height value, z, by using Perlin noise
 float TerrainGenerator::getHeight(float x, float y) {
-    //    float amp = 1;
-    //    float x_mod = 0.5;
-    //    float y_mod = 1.5;
-    //    float z = amp * computePerlin(x_mod * x * 5, y_mod * y * 5) / 2;
+    float noise_value = 0.0f;
 
-    float z1 = 0.75 * computePerlin(x, y) / 2;
-//    float z1 = 0.5 * computePerlin(0.5 * x * 5, 0.5 * y * 5) / 2;
-//    float z2 = 0.25 * computePerlin(1 * x * 5, 1 * y * 5) / 2;
-//    float z3 = 0.125 * computePerlin(2 * x * 5, 2 * y * 5) / 2;
-//    float z4 = 0.0625 * computePerlin(4 * x * 5, 4 * y * 5) / 2;
+    int octaves = 4;
+    float persistence = 0.75f;
 
-    return z1; // + z2 + z3 + z4;
+    for (int i = 0; i < octaves; i++) {
+        float frequency = pow(2, i - 1);
+        float amplitude = pow(persistence, i) - 0.25;
+
+        noise_value += amplitude * computePerlin(x * frequency, y * frequency) / 2;
+    }
+
+//    std::cout << "noise: " << noise_value << "\n";
+
+    return noise_value;
 }
 
 // Generates the height map for generating the terrain
@@ -104,6 +108,7 @@ std::vector<float> TerrainGenerator::generateTerrain() {
         for(int y = 0; y < m_resolution; y++) {
             float h = getHeight(x,y);
 //            heights.push_back(h);
+//            std::cout << "h: " << h << "\n";
             heights[x * m_resolution + y] = h;
         }
     }

@@ -126,6 +126,7 @@ void PlanetGeneration::initializeGL() {
     // Initialise sphere data and VBO/VAO
     m_sphere = Sphere();
     m_sphere.updateParams(settings.shapeParameter1, settings.shapeParameter2);
+//    m_sphere.updateParams(25, 25);
     initSphere();
 
     // Initialise terrain default data and texture
@@ -161,10 +162,10 @@ void PlanetGeneration::initializeGL() {
 
 void PlanetGeneration::paintGL() {
     if (initialised) {
-        if (settings.outlines) {
-            paintOutline();
-            return;
-        }
+       if (settings.outlines) {
+           paintOutline();
+           return;
+       }
 
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

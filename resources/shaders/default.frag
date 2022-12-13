@@ -19,6 +19,8 @@ vec4 lightColor = vec4(.5, .5, 1.f, 1.0);
 
 out vec4 fragColor;
 
+in vec4 height_offset;
+
 void toonColor() {
     vec3 lightDir = normalize(lightPos - worldPosition);
     float intensity = clamp(dot(lightDir, normalize(worldNormal)), 0.f, 1.f);
@@ -77,6 +79,8 @@ void main() {
     vec3 N3 = normalize(worldNormal);
     vec4 N = vec4(N3, 0.0);
 
-    if (shaderType == SHADER_PHONG) phong();
-    if (shaderType == SHADER_TOON) toonColor();
+//    if (shaderType == SHADER_PHONG) phong();
+//    if (shaderType == SHADER_TOON) toonColor();
+
+    fragColor = N;
 }
