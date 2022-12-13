@@ -5,7 +5,7 @@ layout(location = 1) in vec2 uv;
 
 out vec3 worldPosition;
 out vec3 worldNormal;
-out vec4 color;
+//out vec4 color;
 
 uniform mat4 modelMatrix;
 uniform mat4 MVPMatrix;
@@ -30,6 +30,6 @@ void main() {
     vec4 worldPos4 = modelMatrix * finalPos;
     worldPosition = worldPos4.xyz;
     worldNormal = normalize(finalPos.xyz);
-    color = globe_color;
+//    color = globe_color;
     gl_Position = MVPMatrix * finalPos;
 }

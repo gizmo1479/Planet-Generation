@@ -2,7 +2,7 @@
 
 in vec3 worldPosition;
 in vec3 worldNormal;
-in vec4 color;
+//in vec4 color;
 
 uniform int shaderType;
 uniform vec3 cameraPos;
@@ -77,8 +77,8 @@ void main() {
     // Remember that you need to renormalize vectors here if you want them to be normalized
     vec3 N3 = normalize(worldNormal);
     vec4 N = vec4(N3, 0.0);
-    fragColor = vec4(1);
-    fragColor = color;
-//    if (shaderType == SHADER_PHONG) phong();
-//    if (shaderType == SHADER_TOON) toonColor();
+//    fragColor = vec4(1);
+//    fragColor = color;
+    if (shaderType == SHADER_PHONG) phong();
+    if (shaderType == SHADER_TOON) toonColor();
 }

@@ -48,6 +48,6 @@ void main() {
 
    // fragColor = vec4(abs(N));
 //    toonColor();
-    fragColor = vec4(0.f);
-   // phong();
+//    fragColor = vec4(0.f);
+    phong();
 }

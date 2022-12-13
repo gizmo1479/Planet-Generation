@@ -217,8 +217,10 @@ void PlanetGeneration::paintGL() {
         glUseProgram(0);
 
         // now draw the skybox where the sphere isnt
-        m_skybox.update(m_view, m_proj);
-        m_skybox.paint();
+        if (settings.skybox) {
+            m_skybox.update(m_view, m_proj);
+            m_skybox.paint();
+        }
     }
 }
 
@@ -247,12 +249,14 @@ void PlanetGeneration::paintOutline() {
     glStencilMask(0xFF);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
     glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);
 
-    // do outline
+//     do outline
     glUseProgram(m_outline_shader);
     glBindVertexArray(m_outline_vao);
     sendUniforms(&m_outline_shader);

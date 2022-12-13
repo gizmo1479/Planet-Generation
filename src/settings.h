@@ -46,6 +46,7 @@ struct Settings {
     int shapeParameter1 = 1;
     int shapeParameter2 = 1;
     bool outlines;
+    bool skybox;
     int shaderType;
 
     // Brush
