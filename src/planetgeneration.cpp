@@ -39,6 +39,7 @@ void PlanetGeneration::finish() {
 
     glDeleteProgram(m_shader);
     glDeleteProgram(m_outline_shader);
+    glDeleteProgram(m_skybox_shader);
 
     this->doneCurrent();
 }
@@ -121,6 +122,7 @@ void PlanetGeneration::initializeGL() {
     // Shader setup
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
     m_outline_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/outline.frag");
+    m_skybox_shader = ShaderLoader::createShaderProgram(":/resources/shaders/skybox.vert", ":/resources/shaders/skybox.frag");
 
 
     // Initialise sphere data and VBO/VAO
@@ -152,6 +154,28 @@ void PlanetGeneration::initializeGL() {
     glUseProgram(m_shader);
     GLuint texture = glGetUniformLocation(m_shader, "height_map");
     glUniform1i(texture, 0);
+    glUseProgram(0);
+
+    // Generate texture object for canvas data
+    glGenTextures(1, &m_canvas_tex);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
+
+    // Set canvas texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // Load canvas image into texture
+    QImage globe_img = m_canvas->m_img;
+    globe_img = globe_img.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 500, 500, 0, GL_RGBA, GL_UNSIGNED_BYTE, globe_img.bits());
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    GLuint globe = glGetUniformLocation(m_shader, "globe");
+    std::cout << "globe loc: " << globe << "\n";
+    glUniform1i(globe, 1);
+    glActiveTexture(GL_TEXTURE0);
     glUseProgram(0);
 
     // initialise camera matrices
@@ -186,6 +210,13 @@ void PlanetGeneration::paintGL() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
 
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
+
+//        glEnable(GL_TEXTURE_2D);
+//        glEnable(GL_TEXTURE0);
+//        glEnable(GL_TEXTURE1);
+
         glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
 
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -193,13 +224,25 @@ void PlanetGeneration::paintGL() {
         glUseProgram(0);
 
         // now draw the skybox where the sphere isnt
-        m_skybox.update(m_view, m_proj);
-        m_skybox.paint(m_skybox_shader);
-
-        //paintSkybox();
+        if (settings.skybox) {
+            m_skybox.update(m_view, m_proj);
+            m_skybox.paint();
+        }
     }
 }
 
+void PlanetGeneration::paintCanvas() {
+    if (initialised) {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
+        QImage globe_img = m_canvas->m_img;
+        globe_img = globe_img.convertToFormat(QImage::Format_RGBA8888).mirrored();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 500, 500, 0, GL_RGBA, GL_UNSIGNED_BYTE, globe_img.bits());
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glActiveTexture(GL_TEXTURE0);
+        update();
+    }
+}
 
 void PlanetGeneration::paintOutline() {
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -213,12 +256,14 @@ void PlanetGeneration::paintOutline() {
     glStencilMask(0xFF);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
     glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);
 
-    // do outline
+//     do outline
     glUseProgram(m_outline_shader);
     glBindVertexArray(m_outline_vao);
     sendUniforms(&m_outline_shader);

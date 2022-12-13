@@ -10,7 +10,6 @@
 #include <QPushButton>
 #include <QBoxLayout>
 #include "planetgeneration.h"
-#include "canvas2d.h"
 
 class MainWindow : public QWidget
 {
@@ -22,7 +21,6 @@ public:
 
 private:
     void setupCanvas2D();
-    Canvas2D *m_canvas;
 
     void addHeading(QBoxLayout *layout, QString text);
     void addLabel(QBoxLayout *layout, QString text);
@@ -55,6 +53,7 @@ private slots:
     void setFloatVal(float &setValue, float newValue);
     void setBoolVal(bool &setValue, bool newValue);
 
+    void onRenderButtonClick();
     void onClearButtonClick();
     void onFilterButtonClick();
     void onRevertButtonClick();
