@@ -150,26 +150,31 @@ void PlanetGeneration::initializeGL() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, res, res, 0, GL_RED, GL_UNSIGNED_BYTE, heights.data());
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    glUseProgram(m_shader);
+    GLuint texture = glGetUniformLocation(m_shader, "height_map");
+    glUniform1i(texture, 0);
+    glUseProgram(0);
+
     // Generate texture object for canvas data
     glGenTextures(1, &m_canvas_tex);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
+
     // Set canvas texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     // Load canvas image into texture
     QImage globe_img = m_canvas->m_img;
     globe_img = globe_img.convertToFormat(QImage::Format_RGBA8888).mirrored();
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 500, 500, 0, GL_RGBA, GL_UNSIGNED_BYTE, globe_img.bits());
     glBindTexture(GL_TEXTURE_2D, 0);
-    glActiveTexture(GL_TEXTURE0);
 
     glUseProgram(m_shader);
-    GLuint texture = glGetUniformLocation(m_shader, "height_map");
     GLuint globe = glGetUniformLocation(m_shader, "globe");
     std::cout << "globe loc: " << globe << "\n";
-    glUniform1i(texture, 0);
     glUniform1i(globe, 1);
+    glActiveTexture(GL_TEXTURE0);
     glUseProgram(0);
 
     // initialise camera matrices
@@ -186,10 +191,10 @@ void PlanetGeneration::initializeGL() {
 
 void PlanetGeneration::paintGL() {
     if (initialised) {
-//        if (settings.outlines) {
-//            paintOutline();
-//            return;
-//        }
+        if (settings.outlines) {
+            paintOutline();
+            return;
+        }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(m_shader);
         glBindVertexArray(m_sphere_vao);
@@ -198,9 +203,12 @@ void PlanetGeneration::paintGL() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
 
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_TEXTURE0);
-        glEnable(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
+
+//        glEnable(GL_TEXTURE_2D);
+//        glEnable(GL_TEXTURE0);
+//        glEnable(GL_TEXTURE1);
 
         glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
 

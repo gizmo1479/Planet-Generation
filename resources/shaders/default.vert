@@ -21,9 +21,9 @@ void main() {
 
     // check color; if blue, don't offset objpos
     vec4 globe_color = texture(globe, uv);
-    if (globe_color.b != 0.0f) {
+    if (globe_color.g != 0.0f) {
         // offset object position by height obtained from height map
-        vec4 offset = texture2D(height_map, uv).r * N4;
+        vec4 offset = texture(height_map, uv).r * N4;
         finalPos = objPos4 + offset;
     }
 
