@@ -167,7 +167,7 @@ void PlanetGeneration::initializeGL() {
 
     // Load canvas image into texture
     QImage globe_img = m_canvas->m_img;
-    globe_img = globe_img.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    globe_img = globe_img.convertToFormat(QImage::Format_RGBA8888);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 500, 500, 0, GL_RGBA, GL_UNSIGNED_BYTE, globe_img.bits());
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -182,13 +182,13 @@ void PlanetGeneration::initializeGL() {
     rebuildCameraMatrices(width(), height());
 
     // make skybox
-    auto back = "/home/gizmo1479/Pictures/skybox2/back.jpg";
-    auto top = "/home/gizmo1479/Pictures/skybox2/top.jpg";
-    auto left = "/home/gizmo1479/Pictures/skybox2/left.jpg";
-    auto right = "/home/gizmo1479/Pictures/skybox2/right.jpg";
-    auto bottom = "/home/gizmo1479/Pictures/skybox2/bottom.jpg";
-    auto front = "/home/gizmo1479/Pictures/skybox2/front.jpg";
-    std::array<std::string, 6> images = {left, left, left, left, left, left};
+    auto back = ":resources/skybox/back.jpg";
+    auto top = ":resources/skybox/top.jpg";
+    auto left = ":resources/skybox/left.jpg";
+    auto right = ":resources/skybox/right.jpg";
+    auto bottom = ":resources/skybox/bottom.jpg";
+    auto front = ":resources/skybox/front.jpg";
+    std::array<std::string, 6> images = {right, left, top, bottom, front, back};
     m_skybox = Skybox(images, 2, m_view, m_proj); // TODO: update tex slot if needed
     m_skybox_shader = ShaderLoader::createShaderProgram(":resources/shaders/skybox.vert",
                                                         ":resources/shaders/skybox.frag");
@@ -217,7 +217,7 @@ void PlanetGeneration::paintGL() {
 //        glEnable(GL_TEXTURE0);
 //        glEnable(GL_TEXTURE1);
 
-        glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
+        glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 5);
 
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindVertexArray(0);
@@ -226,7 +226,7 @@ void PlanetGeneration::paintGL() {
         // now draw the skybox where the sphere isnt
         if (settings.skybox) {
             m_skybox.update(m_view, m_proj);
-            m_skybox.paint();
+            m_skybox.paint(m_skybox_shader);
         }
     }
 }
@@ -258,7 +258,7 @@ void PlanetGeneration::paintOutline() {
     glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
-    glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
+    glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 5);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);
@@ -273,7 +273,7 @@ void PlanetGeneration::paintOutline() {
     glDisable(GL_DEPTH_TEST); // TODO: is this necessary?
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
-    glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 3);
+    glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 5);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);
