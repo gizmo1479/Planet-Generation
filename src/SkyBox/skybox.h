@@ -15,9 +15,13 @@ public:
     Skybox(std::array<std::string, 6> images, int texSlot, glm::mat4 view,
            glm::mat4 proj);
     ~Skybox();
-    void paint();
+    void paint(GLuint shader);
     void update(glm::mat4 view, glm::mat4 proj);
-    GLuint m_skybox_shader;
+
+    GLuint vao, vbo, m_shader, tex;
+    int texSlot;
+
+    glm::mat4 view, proj;
 private:
     void createTex();
     void createData();
@@ -25,10 +29,6 @@ private:
     std::vector<float> getVerts();
 
     std::array<std::string, 6> m_images;
-    GLuint m_vao, m_vbo, m_tex;
-    int m_texSlot;
-
-    glm::mat4 view, proj;
 };
 
 #endif // SKYBOX_H

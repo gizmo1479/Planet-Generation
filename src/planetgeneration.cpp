@@ -128,6 +128,7 @@ void PlanetGeneration::initializeGL() {
     // Initialise sphere data and VBO/VAO
     m_sphere = Sphere();
     m_sphere.updateParams(settings.shapeParameter1, settings.shapeParameter2);
+//    m_sphere.updateParams(25, 25);
     initSphere();
 
     // Initialise terrain default data and texture
@@ -181,20 +182,26 @@ void PlanetGeneration::initializeGL() {
     rebuildCameraMatrices(width(), height());
 
     // make skybox
-    auto s = "/home/gizmo1479/Pictures/cat-mountain.png";
-    std::array<std::string, 6> images = {s, s, s, s, s, s};
+    auto back = "/home/gizmo1479/Pictures/skybox2/back.jpg";
+    auto top = "/home/gizmo1479/Pictures/skybox2/top.jpg";
+    auto left = "/home/gizmo1479/Pictures/skybox2/left.jpg";
+    auto right = "/home/gizmo1479/Pictures/skybox2/right.jpg";
+    auto bottom = "/home/gizmo1479/Pictures/skybox2/bottom.jpg";
+    auto front = "/home/gizmo1479/Pictures/skybox2/front.jpg";
+    std::array<std::string, 6> images = {left, left, left, left, left, left};
     m_skybox = Skybox(images, 2, m_view, m_proj); // TODO: update tex slot if needed
-    m_skybox.m_skybox_shader = m_skybox_shader;
-
+    m_skybox_shader = ShaderLoader::createShaderProgram(":resources/shaders/skybox.vert",
+                                                        ":resources/shaders/skybox.frag");
     initialised = true;
 }
 
 void PlanetGeneration::paintGL() {
     if (initialised) {
-        if (settings.outlines) {
-            paintOutline();
-            return;
-        }
+       if (settings.outlines) {
+           paintOutline();
+           return;
+       }
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(m_shader);
         glBindVertexArray(m_sphere_vao);
