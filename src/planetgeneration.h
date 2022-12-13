@@ -3,6 +3,7 @@
 // Defined before including GLEW to suppress deprecation messages on macOS
 #include "sphere.h"
 #include "terraingenerator.h"
+#include "SkyBox/skybox.h"
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
@@ -72,6 +73,11 @@ private:
     GLuint m_outline_shader;
     void paintOutline();
     bool outline = true;
+
+    /*** skybox ***/
+    Skybox m_skybox;
+    GLuint m_skybox_shader;
+    void paintSkybox();
 
     float  m_angleX;
     float  m_angleY;

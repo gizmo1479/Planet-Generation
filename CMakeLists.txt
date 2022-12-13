@@ -73,6 +73,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     PREFIX
         "/"
     FILES
+        resources/shaders/skybox.frag
+        resources/shaders/skybox.vert
         resources/shaders/outline.frag
         resources/shaders/default.frag
         resources/shaders/default.vert

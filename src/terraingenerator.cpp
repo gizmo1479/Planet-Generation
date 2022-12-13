@@ -15,13 +15,13 @@ TerrainGenerator::TerrainGenerator()
   m_randVecLookup.reserve(m_lookupSize);
 
   // Initialize random number generator
-  std::srand(1230);
+  srand(1230);
 
   // Populate random vector lookup table
   for (int i = 0; i < m_lookupSize; i++)
   {
-    m_randVecLookup.push_back(glm::vec2(std::rand() * 2.0 / RAND_MAX - 1.0,
-                                        std::rand() * 2.0 / RAND_MAX - 1.0));
+    m_randVecLookup.push_back(glm::vec2(rand() * 2.0 / RAND_MAX - 1.0,
+                                        rand() * 2.0 / RAND_MAX - 1.0));
     }
 }
 
