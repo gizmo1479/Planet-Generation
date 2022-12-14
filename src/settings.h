@@ -33,7 +33,8 @@ enum FilterType {
 
 enum TerrainType {
     TERRAIN_WATER,
-    TERRAIN_FLATLANDS
+    TERRAIN_FLATLANDS,
+    TERRAIN_MOUNTAINS
 };
 
 enum ShaderType {

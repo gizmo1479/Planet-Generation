@@ -15,6 +15,7 @@ void Canvas2D::init() {
     m_mask.resize(pow(2 * settings.brushRadius + 1, 2));
     if (settings.brushTerrain == TERRAIN_WATER) settings.brushColor  = {0, 0, 128, 255};
     else if (settings.brushTerrain == TERRAIN_FLATLANDS) settings.brushColor = {0, 255, 0, 255};
+    else if (settings.brushTerrain == TERRAIN_MOUNTAINS) settings.brushColor = {150, 150, 150, 255};
 
     fillMask();
 //    m_smudge.resize(pow(2 * settings.brushRadius + 1, 2));
@@ -432,6 +433,7 @@ void Canvas2D::settingsChanged() {
     // TODO: fill in what you need to do when brush or filter parameters change
     if (settings.brushTerrain == TERRAIN_WATER) settings.brushColor  = {0, 0, 128, 255};
     else if (settings.brushTerrain == TERRAIN_FLATLANDS) settings.brushColor = {0, 255, 0, 255};
+    else if (settings.brushTerrain == TERRAIN_MOUNTAINS) settings.brushColor = {150, 150, 150, 255};
     if (settings.brushRadius != cur_radius) {
         m_smudge.resize(pow(2 * settings.brushRadius + 1, 2));
         m_mask.resize(pow(2 * settings.brushRadius + 1, 2));
