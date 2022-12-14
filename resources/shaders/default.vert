@@ -5,6 +5,8 @@ layout(location = 1) in vec2 uv;
 
 out vec3 worldPosition;
 out vec3 worldNormal;
+out float height_offset;
+out vec4 lightColor;
 //out vec4 color;
 
 uniform mat4 modelMatrix;
@@ -13,7 +15,22 @@ uniform mat4 MVPMatrix;
 uniform sampler2D globe;
 uniform sampler2D height_map;
 
-out vec4 height_offset;
+uniform int shaderType;
+
+void selectColor() {
+    float water = 0.0f;
+    float sky = 0.05f;
+
+    if (height_offset <= water) {
+        lightColor = vec4(.2f, .2f, .9f, 1.0);
+        if (shaderType == 1) lightColor = vec4(.35f, .48f, 1.f, 1.0);
+    } else if ((height_offset > water) && (height_offset < sky)) {
+        lightColor = vec4(0.0f, .8f, 0.0f, 1.0);
+        if (shaderType == 1) lightColor = vec4(.35f, 1.f, .35f, 1.f); // .47f
+    } else {
+        lightColor = vec4(.9f, .9f, .9f, 1.0);
+    }
+}
 
 void main() {
     vec4 objPos4 = vec4(objectPosition, 1);
@@ -25,21 +42,22 @@ void main() {
     vec4 globe_color = texture(globe, uv);
     // offset object position by height obtained from height map
     // vec4 offset = texture(height_map, uv).r * N4;
+    
+    if (globe_color.g != 0.0f) {
     vec4 offset = texture2D(height_map, uv).r * N4;
     if (globe_color.r != 0.0f) {          // mountains!
         offset = 0.1 * offset;
         finalPos = objPos4 + offset; // change this somehow
     }
     else if (globe_color.g != 0.0f) {     // flatlands!
-        offset = 0.05f * offset;
         finalPos = objPos4 + offset;
+        height_offset = length(offset);
     }
-
-    height_offset = offset;
 
     vec4 worldPos4 = modelMatrix * finalPos;
     worldPosition = worldPos4.xyz;
     worldNormal = normalize(finalPos.xyz);
-//    color = globe_color;
+    selectColor();
     gl_Position = MVPMatrix * finalPos;
+
 }
