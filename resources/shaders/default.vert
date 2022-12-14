@@ -6,6 +6,7 @@ layout(location = 1) in vec2 uv;
 out vec3 worldPosition;
 out vec3 worldNormal;
 out float height_offset;
+out vec4 lightColor;
 //out vec4 color;
 
 uniform mat4 modelMatrix;
@@ -24,7 +25,7 @@ void main() {
     vec4 globe_color = texture(globe, uv);
     // offset object position by height obtained from height map
     // vec4 offset = texture(height_map, uv).r * N4;
-    vec4 offset = 0.1f * texture2D(height_map, uv).r * N4;
+    vec4 offset = 0.15f * texture2D(height_map, uv).r * N4;
     height_offset = 0.0f;
     
     if (globe_color.g != 0.0f) {
@@ -37,4 +38,16 @@ void main() {
     worldNormal = normalize(finalPos.xyz);
 //    color = globe_color;
     gl_Position = MVPMatrix * finalPos;
+
+    float water = 0.0f;
+    float sky = 0.05f;
+
+    if (height_offset <= water) {
+        lightColor = vec4(.2f, .2f, .9f, 1.0);
+    } else if ((height_offset > water) && (height_offset < sky)) {
+        lightColor = vec4(0.0f, .8f, 0.0f, 1.0);
+    } else {
+        lightColor = vec4(.9f, .9f, .9f, 1.0);
+    }
+
 }

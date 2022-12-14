@@ -53,24 +53,24 @@ void MainWindow::initialize() {
     p1Slider = new QSlider(Qt::Orientation::Horizontal); // Parameter 1 slider
     p1Slider->setTickInterval(1);
     p1Slider->setMinimum(1);
-    p1Slider->setMaximum(50);
+    p1Slider->setMaximum(100);
     p1Slider->setValue(1);
 
     p1Box = new QSpinBox();
     p1Box->setMinimum(1);
-    p1Box->setMaximum(50);
+    p1Box->setMaximum(100);
     p1Box->setSingleStep(1);
     p1Box->setValue(1);
 
     p2Slider = new QSlider(Qt::Orientation::Horizontal); // Parameter 2 slider
     p2Slider->setTickInterval(1);
     p2Slider->setMinimum(1);
-    p2Slider->setMaximum(50);
+    p2Slider->setMaximum(100);
     p2Slider->setValue(1);
 
     p2Box = new QSpinBox();
     p2Box->setMinimum(1);
-    p2Box->setMaximum(50);
+    p2Box->setMaximum(100);
     p2Box->setSingleStep(1);
     p2Box->setValue(1);
 
