@@ -10,6 +10,9 @@ void Settings::loadSettingsOrDefaults() {
     // Load image settings
     QSettings s("CS123", "CS123");
 
+    shapeParameter1 = s.value("shapeParameter1", 50).toInt();
+    shapeParameter2 = s.value("shapeParameter2", 50).toInt();
+
     brushType = s.value("brushType", BRUSH_CONSTANT).toInt();
     brushTerrain = s.value("brushTerrain", TERRAIN_WATER).toInt();
     shaderType = s.value("shaderType", SHADER_PHONG).toInt();
@@ -46,6 +49,9 @@ void Settings::loadSettingsOrDefaults() {
  */
 void Settings::saveSettings() {
     QSettings s("CS123", "CS123");
+
+    s.setValue("ShapeParameter1", settings.shapeParameter1);
+    s.setValue("ShapeParameter2", settings.shapeParameter2);
 
     s.setValue("brushType", brushType);
     s.setValue("brushTerrain", brushTerrain);

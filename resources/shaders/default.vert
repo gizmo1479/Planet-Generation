@@ -25,9 +25,13 @@ void main() {
     vec4 globe_color = texture(globe, uv);
     // offset object position by height obtained from height map
     // vec4 offset = texture(height_map, uv).r * N4;
-    vec4 offset = 0.05f * texture2D(height_map, uv).r * N4;
-    
-    if (globe_color.g != 0.0f) {
+    vec4 offset = texture2D(height_map, uv).r * N4;
+    if (globe_color.r != 0.0f) {          // mountains!
+        offset = 0.1 * offset;
+        finalPos = objPos4 + offset; // change this somehow
+    }
+    else if (globe_color.g != 0.0f) {     // flatlands!
+        offset = 0.05f * offset;
         finalPos = objPos4 + offset;
     }
 

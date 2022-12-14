@@ -108,6 +108,7 @@ void MainWindow::initialize() {
     addSpinBox(brushesLayout, "radius", 1, 100, 1, settings.brushRadius, [this](int value){ setIntVal(settings.brushRadius, value); });
     addRadioButton(brushesLayout, "Water", settings.brushTerrain == TERRAIN_WATER, [this]{ setTerrainType(TERRAIN_WATER); });
     addRadioButton(brushesLayout, "Flatlands", settings.brushTerrain == TERRAIN_FLATLANDS, [this]{ setTerrainType(TERRAIN_FLATLANDS); });
+    addRadioButton(brushesLayout, "Mountains", settings.brushTerrain == TERRAIN_MOUNTAINS, [this]{ setTerrainType(TERRAIN_MOUNTAINS); });
     addPushButton(brushesLayout, "Save Map", &MainWindow::onSaveButtonClick);
     addPushButton(brushesLayout, "Load Map", &MainWindow::onUploadButtonClick);
     brushesGroup->setLayout(brushesLayout);
@@ -115,8 +116,8 @@ void MainWindow::initialize() {
     connectUIElements();
 
     // Set default values of 5 for tesselation parameters
-    onValChangeP1(5);
-    onValChangeP2(5);
+    onValChangeP1(settings.shapeParameter1);
+    onValChangeP2(settings.shapeParameter2);
 }
 
 /**
