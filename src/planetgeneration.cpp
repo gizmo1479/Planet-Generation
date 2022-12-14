@@ -62,7 +62,7 @@ void PlanetGeneration::initSphere() {
     // initialise outline stuff
     glGenBuffers(1, &m_outline_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_outline_vbo);
-    auto sphereScale = m_sphere.generateShapeScale(1.05); // TODO: change if needed
+    auto sphereScale = m_sphere.generateShapeScale(1.09); // TODO: change if needed
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*sphereScale.size(), sphereScale.data(), GL_STATIC_DRAW);
     glGenVertexArrays(1, &m_outline_vao);
     glBindVertexArray(m_outline_vao);
@@ -81,7 +81,7 @@ void PlanetGeneration::setSphereVBO() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_outline_vbo);
-    auto v2 = m_sphere.generateShapeScale(1.05);
+    auto v2 = m_sphere.generateShapeScale(1.09);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*v2.size(), v2.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -197,6 +197,7 @@ void PlanetGeneration::initializeGL() {
 void PlanetGeneration::paintGL() {
     if (initialised) {
        if (settings.outlines) {
+
            paintOutline();
            return;
        }
@@ -247,6 +248,8 @@ void PlanetGeneration::paintOutline() {
     glBindVertexArray(m_sphere_vao);
     sendUniforms(&m_shader);
 
+
+
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);
     glActiveTexture(GL_TEXTURE0);
@@ -266,8 +269,12 @@ void PlanetGeneration::paintOutline() {
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00);
     glDisable(GL_DEPTH_TEST); // TODO: is this necessary?
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
+
     glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 5);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
