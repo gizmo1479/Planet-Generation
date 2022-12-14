@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QBoxLayout>
+#include "canvas2d.h"
 #include "planetgeneration.h"
 
 class MainWindow : public QWidget
@@ -35,6 +36,7 @@ private:
     void connectUploadFile();
 
     PlanetGeneration *planetgeneration;
+    Canvas2D *m_canvas;
     QPushButton *uploadFile;
     QSlider *p1Slider;
     QSlider *p2Slider;

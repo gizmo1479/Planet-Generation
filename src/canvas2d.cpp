@@ -354,6 +354,8 @@ void Canvas2D::clearCanvas() {
     m_data.assign(m_width * m_height, RGBA{0, 0, 128, 255});
     settings.imagePath = "";
     displayImage();
+    planet->m_img = img;
+    planet->paintCanvas();
 }
 
 /**
@@ -387,9 +389,9 @@ bool Canvas2D::loadImageFromFile(const QString &file) {
  * @brief Get Canvas2D's image data and display this to the GUI
  */
 void Canvas2D::displayImage() {
-    QByteArray* img = new QByteArray(reinterpret_cast<const char*>(m_data.data()), 4*m_data.size());
-    m_img = QImage((const uchar*)img->data(), m_width, m_height, QImage::Format_RGBX8888);
-    setPixmap(QPixmap::fromImage(m_img));
+    QByteArray* new_img = new QByteArray(reinterpret_cast<const char*>(m_data.data()), 4*m_data.size());
+    img = QImage((const uchar*)new_img->data(), m_width, m_height, QImage::Format_RGBX8888);
+    setPixmap(QPixmap::fromImage(img));
     setFixedSize(m_width, m_height);
     update();
 }
@@ -458,6 +460,8 @@ void Canvas2D::mouseDown(int x, int y) {
         }
 
     }
+    planet->m_img = img;
+    planet->paintCanvas();
 }
 
 void Canvas2D::mouseDragged(int x, int y) {
@@ -468,9 +472,13 @@ void Canvas2D::mouseDragged(int x, int y) {
             displayImage();
         }
     }
+    planet->m_img = img;
+    planet->paintCanvas();
 }
 
 void Canvas2D::mouseUp(int x, int y) {
     // Brush TODO
     m_isDown = false;
+    planet->m_img = img;
+    planet->paintCanvas();
 }

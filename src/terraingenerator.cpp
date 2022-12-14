@@ -8,7 +8,7 @@
 TerrainGenerator::TerrainGenerator()
 {
   // Define resolution of terrain generation
-  m_resolution = 100;
+  m_resolution = 500;
 
   // Generate random vector lookup table
   m_lookupSize = 1024;
@@ -82,6 +82,24 @@ float TerrainGenerator::computePerlin(float x, float y) {
 // Takes a normalized (x, y) position, in range [0,1)
 // Returns a height value, z, by using Perlin noise
 float TerrainGenerator::getHeight(float x, float y) {
+    float noise_value = 0.0f;
+
+    int octaves = 4;
+    float persistence = 0.75f;
+
+    for (int i = 0; i < octaves; i++) {
+        float frequency = pow(2, i - 1);
+        float amplitude = pow(persistence, i) - 0.25;
+
+        noise_value += amplitude * computePerlin(x * frequency, y * frequency) / 2;
+    }
+
+//    std::cout << "noise: " << noise_value << "\n";
+
+    return noise_value;
+}
+
+float TerrainGenerator::getHeight2(float x, float y) {
     float noise_value = 0.0f;
 
     int octaves = 4;

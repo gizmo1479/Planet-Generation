@@ -27,6 +27,7 @@ private:
     // Takes a normalized (x, y) position, in range [0,1)
     // Returns a height value, z, by sampling a noise function
     float getHeight(float x, float y);
+    float getHeight2(float x, float y);
 
     // Computes the normal of a vertex by averaging neighbors
 //    glm::vec3 getNormal(int row, int col);

@@ -48,7 +48,7 @@ void PlanetGeneration::initSphere() {
     // initialise sphere vbo and vao
     glGenBuffers(1, &m_sphere_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_sphere_vbo);
-    std::vector<GLfloat> sphere_data = m_sphere.generateShape();
+    std::vector<GLfloat> sphere_data = m_sphere.generateShapeScale(1.5);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * sphere_data.size(), sphere_data.data(), GL_STATIC_DRAW);
     glGenVertexArrays(1, &m_sphere_vao);
     glBindVertexArray(m_sphere_vao);
@@ -62,7 +62,7 @@ void PlanetGeneration::initSphere() {
     // initialise outline stuff
     glGenBuffers(1, &m_outline_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_outline_vbo);
-    auto sphereScale = m_sphere.generateShapeScale(1.09); // TODO: change if needed
+    auto sphereScale = m_sphere.generateShapeScale(1.02); // TODO: change if needed
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*sphereScale.size(), sphereScale.data(), GL_STATIC_DRAW);
     glGenVertexArrays(1, &m_outline_vao);
     glBindVertexArray(m_outline_vao);
@@ -76,12 +76,12 @@ void PlanetGeneration::initSphere() {
 
 void PlanetGeneration::setSphereVBO() {
     glBindBuffer(GL_ARRAY_BUFFER, m_sphere_vbo);
-    auto v = m_sphere.generateShape();
+    auto v = m_sphere.generateShapeScale(1.5);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*v.size(), v.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_outline_vbo);
-    auto v2 = m_sphere.generateShapeScale(1.09);
+    auto v2 = m_sphere.generateShapeScale(1.02);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*v2.size(), v2.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -165,7 +165,7 @@ void PlanetGeneration::initializeGL() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // Load canvas image into texture
-    QImage globe_img = m_canvas->m_img;
+    QImage globe_img = m_img;
     globe_img = globe_img.convertToFormat(QImage::Format_RGBA8888);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 500, 500, 0, GL_RGBA, GL_UNSIGNED_BYTE, globe_img.bits());
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -231,8 +231,8 @@ void PlanetGeneration::paintCanvas() {
     if (initialised) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
-        QImage globe_img = m_canvas->m_img;
-        globe_img = globe_img.convertToFormat(QImage::Format_RGBA8888).mirrored();
+        QImage globe_img = m_img;
+        globe_img = globe_img.convertToFormat(QImage::Format_RGBA8888);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 500, 500, 0, GL_RGBA, GL_UNSIGNED_BYTE, globe_img.bits());
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(GL_TEXTURE0);
@@ -274,6 +274,8 @@ void PlanetGeneration::paintOutline() {
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_terrain_texture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_canvas_tex);
 
     glDrawArrays(GL_TRIANGLES, 0, m_sphere.generateShape().size() / 5);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -380,7 +382,7 @@ void PlanetGeneration::timerEvent(QTimerEvent *event) {
 }
 
 void PlanetGeneration::wheelEvent(QWheelEvent *event) {
-    m_zoom -= event->angleDelta().y() / 100.f;
+    m_zoom -= event->angleDelta().y() / 200.f;
     rebuildCameraMatrices(width(), height());
 }
 

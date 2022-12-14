@@ -18,8 +18,8 @@ uniform int shaderType;
 float height_offset;
 void selectColor() {
     float water = 0.0f;
-    float grass = .05f;
-    float grass2 = .07f;
+    float grass = .04f;
+    float grass2 = .08f;
     float sky = 0.15f;
 
     if (height_offset <= water) {

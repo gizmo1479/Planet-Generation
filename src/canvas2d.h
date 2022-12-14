@@ -1,3 +1,4 @@
+#pragma once
 #ifndef CANVAS2D_H
 #define CANVAS2D_H
 
@@ -5,6 +6,7 @@
 #include <QMouseEvent>
 #include <array>
 #include <glm/glm.hpp>
+#include "planetgeneration.h"
 #include "rgba.h"
 
 class Canvas2D : public QLabel {
@@ -13,7 +15,8 @@ public:
     int m_width = 500;
     int m_height = 500;
     std::vector<RGBA> m_data;
-    QImage m_img;
+    PlanetGeneration *planet;
+    QImage img;
     void init();
     void clearCanvas();
     bool loadImageFromFile(const QString &file);

@@ -1,7 +1,6 @@
 #pragma once
 
 // Defined before including GLEW to suppress deprecation messages on macOS
-#include "canvas2d.h"
 #include "sphere.h"
 #include "terraingenerator.h"
 #include "SkyBox/skybox.h"
@@ -25,7 +24,7 @@ public:
     void sceneChanged();
     void settingsChanged();
     void paintCanvas();
-    Canvas2D *m_canvas;
+    QImage m_img;
 public slots:
     void tick(QTimerEvent* event);                      // Called once per tick of m_timer
 
