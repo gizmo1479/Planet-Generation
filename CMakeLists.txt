@@ -78,7 +78,6 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/outline.frag
         resources/shaders/default.frag
         resources/shaders/default.vert
-        resources/shaders/outline.vert
         resources/skybox/back.jpg
         resources/skybox/left.jpg
         resources/skybox/right.jpg

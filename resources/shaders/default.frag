@@ -2,7 +2,6 @@
 
 in vec3 worldPosition;
 in vec3 worldNormal;
-in float height_offset;
 //in vec4 color;
 
 uniform int shaderType;
